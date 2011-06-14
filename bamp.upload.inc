@@ -292,7 +292,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $rid = next_id('bamp_field_results');
     $nid = $rid;
     $site = $aa[$j][7];
-    $site_name = str_replace(" ", "_", $site);
+    $site_name = trim(str_replace("  ", " ", $site));
     $method = '0';
     $date = $aa[$j][3];
     $crew = $aa[$j][9];

@@ -1,5 +1,32 @@
 <?php
 
+/**
+ *  Create top-level search menu page
+ */
+
+function bamp_search_form($form_state) {
+  drupal_set_title(t('Search menu'));
+
+  $form = array();
+
+  $content['form'] = array(
+    '#markup' => '<p>This is the BAMP search menu</p>',
+  );
+
+  return $form;
+}
+
+function bamp_search_menu_callback() {
+  return drupal_get_form('bamp_search_form');
+}
+
+/**
+ * Create search/browse page for the results
+ * @param type $form
+ * @param type $form_state
+ * @return type 
+ */
+
 function bamp_search_results_form($form, &$form_state) {
   drupal_set_title(t('Results search form'));
 

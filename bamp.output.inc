@@ -85,54 +85,6 @@ function ajax_example_simplest_callback($form, $form_state) {
   return $form['replace_textfield'];
 }
 
-//  $form = array();
-//
-//  $form['form'] = array(
-//    '#type' => 'fieldset',
-//    '#title' => t('Details'),
-//    '#tree' => TRUE,
-//  );
-//
-//  $form['form']['sid'] = array(
-//    '#type' => 'select',
-//    '#title' => 'Site ID',
-//    '#options' => db_list('bamp_sites', 'name'),
-//  );
-//
-//  $form['form']['date'] = array(
-//    '#type' => 'select',
-//    '#title' => 'Date',
-//    '#options' => db_list('bamp_results', 'date'),
-//  );
-//  
-//  $form['form']['pen'] = array(
-//    '#type' => 'select',
-//    '#title' => 'Pen',
-//    '#options' => db_list('bamp_results', 'pen'),
-//  );
-//
-//  $form['submit'] = array(
-//    '#type' => 'button',
-//    '#value' => t('Submit'),
-//    '#submit' => array('table_show'),
-//    '#ajax' => array(
-//      'callback' => 'build_table',
-//      'wrapper' => 'table-div',
-//      'method' => 'append',
-//    ),
-//  );
-//  
-//  $form['table'] = array(
-//    '#title' => t('New table'),
-//    '#prefix' => '<div id="table-div">',
-//    '#suffix' => '</div>',
-//    '#type' => 'fieldset',
-//    '#description' => t('This is the new table'),
-//  );
-// 
-//  return $form;
-//}
-
 function table_show($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
@@ -144,21 +96,6 @@ function build_table($form, $form_state) {
 function bamprepfarm_menu_callback() {
   return drupal_get_form('bamprepfarm_form');
 }
-
-//function bamprepfarm_form_submit($form, &$form_state) {
-//  drupal_set_message(t('Form submitted successfully'));
-//
-//  $form_state['rebuild'] = TRUE;
-//  
-//  $form['form']['table'] = array(
-//    '#markup' => '<p> This is the BAMP report menu</p>',
-//  );
-//  
-//  var_dump($form);
-//  
-//  return $form;
-//  
-//}
 
 function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
   drupal_set_title(t('Results report form'));
@@ -232,15 +169,29 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
           ->extend("PagerDefault")
           ->limit($page_limit);
   
+  if ($species_id == "") {
+    $species_id = NULL;
+  }
+  
+  if ($trip_id == "") {
+    $trip_id = NULL;
+  }
+  
+  if ($site_id == "") {
+    $site_id = NULL;
+  }
+  
   if ($species_id !== NULL) {
          $select->condition('f.species', $species_id, '=');
   }
+  
+  if ($trip_id !== NULL) {
+         $select->condition('f.trip_id', $trip_id, '=');
+  }
+  
   if ($site_id !== NULL) {
          $select->condition('f.site_name', $site_id, '=');
   }
-  if ($trip_id !== NULL) {
-         $select->condition('f.trip_id', $trip_id, '=');
-  }   
   
   $form['form']['details'] = array(
         '#markup' => $species_message . $trip_message . $site_message,
@@ -265,8 +216,6 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
 
     $rows[] = array_map('check_plain', $result);
   }
-
-  var_dump($rows);
   
   if ($rows == NULL) {
     $form['form']['none'] = array(

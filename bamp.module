@@ -26,42 +26,36 @@ function bamp_menu() {
     'title' => 'BAMP',
     'page callback' => 'bampmain_menu_callback',
     "access callback" => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms'] = array(
     'title' => 'Input Forms',
     'page callback' => 'bampinput_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms/Sample'] = array(
     'title' => 'Sample Form',
     'page callback' => 'bampsample_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms/Farm'] = array(
     'title' => 'Farm Form',
     'page callback' => 'bampfarm_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
-  );
+    );
 
   $items['bamp/Input forms/Site'] = array(
     'title' => 'Site Form',
     'page callback' => 'bampsite_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms/Method'] = array(
     'title' => 'Method Form',
     'page callback' => 'bampmethod_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms/Trip'] = array(
@@ -75,92 +69,78 @@ function bamp_menu() {
     'title' => 'Lab Form',
     'page callback' => 'bamplab_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Input forms/Results'] = array(
     'title' => 'Results Form',
     'page callback' => 'bampres_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Upload forms'] = array(
     'title' => 'Upload Forms',
     'page callback' => 'bampupload_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Upload forms/CSV upload'] = array(
     'title' => 'CSV upload',
     'page callback' => 'bampupcsv_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Upload forms/Crawford field results CSV upload'] = array(
     'title' => 'Crawford field results CSV upload',
     'page callback' => 'bampupcrawfield_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Upload forms/Crawford Site CSV upload'] = array(
     'title' => 'Crawford Site CSV upload',
     'page callback' => 'bampupcrawsite_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Upload forms/Crawford Lab results CSV upload'] = array(
     'title' => 'Crawford lab results CSV upload',
     'page callback' => 'bampupcrawlabr_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Report forms'] = array(
     'title' => 'Report Forms',
     'page callback' => 'bampreport_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Report forms/Farm'] = array(
     'title' => 'Farm report',
     'page callback' => 'bamprepfarm_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
   
   $items['bamp/Report forms/Results'] = array(
     'title' => 'Results report',
     'page callback' => 'bamprepres_menu_callback',
-//    'page arguments' => array(1),
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Report forms/Sites'] = array(
     'title' => 'Sites report',
     'page callback' => 'bamprepsite_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
   
   $items['bamp/Search forms'] = array(
     'title' => 'Search Forms',
     'page callback' => 'bamp_search_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
 
   $items['bamp/Search forms/Results'] = array(
     'title' => 'Search Results',
     'page callback' => 'bamp_search_results_menu_callback',
     'access callback' => TRUE,
-    'expanded' => TRUE,
   );
   
   return $items;
