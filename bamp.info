@@ -1,0 +1,4 @@
+name = BAMP
+description = BAMP project module
+core = 7.x
+files[] = bamp.module
