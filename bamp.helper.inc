@@ -1,10 +1,10 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Function that gives the next value from a field in the specified table
+ * @param type $table
+ * @return type 
  */
-
 
 function next_id($table) {
 
@@ -24,6 +24,13 @@ function next_id($table) {
   return $nxid;
 }
 
+/**
+ * Function that parses a csv file into an array and returns the array
+ * @param type $file
+ * @param type $delimiter
+ * @return type 
+ */
+
 function csv2aa($file, $delimiter) {
   if (($handle = fopen($file, "r")) !== FALSE) {
     $i = 0;
@@ -37,6 +44,14 @@ function csv2aa($file, $delimiter) {
   }
   return $arrarr;
 }
+
+/**
+ * Function will populate a list with unique values from the database
+ * Useful for creating drop down menus
+ * @param type $table
+ * @param type $field
+ * @return type 
+ */
 
 function db_list($table, $field) {
 
@@ -55,10 +70,16 @@ function db_list($table, $field) {
   return $listu;
 }
 
+/**
+ * Function to create empty nodes to use Views to display content
+ * Views expects nodes to be linked to content in the db
+ * @param type $form
+ * @param type $form_state
+ * @param type $nid 
+ */
+
 function dummy_node($form, $form_state, $nid) {
   $node = new stdClass();
-//  $node->nid = $nid;
-//  $node->vid = $nid;
   $node->title = 'Dummy node';
   $node->type = 'article';
   $node->status = 0;
@@ -69,6 +90,11 @@ function dummy_node($form, $form_state, $nid) {
   node_save($node);
 }
 
+/**
+ * Function to check if a node exists or not
+ * @param type $nid
+ * @return type 
+ */
 
 function check_node($nid) {
   if (db_query("SELECT vid FROM {node} WHERE nid = :nid", array(':nid' => $nid))->fetchField()) {
@@ -77,4 +103,25 @@ function check_node($nid) {
   else {
     return FALSE;
   }
+}
+
+/**
+ * Function to calculate the sum of the field displayed on the page
+ * @param type $field
+ * @param type $rows
+ * @return type 
+ */
+
+function bamp_sum($field, $rows) {
+
+  $sum = 0;
+
+  $list_no = count($rows);
+
+  for ($i = 0; $i < $list_no; $i++) {
+
+    $sum += $rows[$i][$field];
+  }
+
+  return $sum;
 }

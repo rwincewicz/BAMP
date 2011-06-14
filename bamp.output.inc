@@ -102,21 +102,24 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
 
   if ($species_id == NULL) {
     $species_message = 'Species: All<br />';
-  } else {
+  }
+  else {
     $species_message = 'Species: ' . $species_id . '<br />';
   }
-  
+
   if ($trip_id == NULL) {
     $trip_message = 'Trip: All<br />';
-  } else {
+  }
+  else {
     $trip_message = 'Trip: ' . $trip_id . '<br />';
   }
-  
+
   if ($site_id == NULL) {
     $site_message = 'Site: All<br />';
-  } else {
+  }
+  else {
     $site_message = 'Site: ' . $site_id . '<br />';
-  }    
+  }
 
   // Check if there is sorting request
   if (isset($_GET['sort']) && isset($_GET['order'])) {
@@ -153,70 +156,76 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
     t('Trip ID'),
     t('Site ID'),
+    t('Lab'),
     t('Date'),
+    t('Crew'),
     t('Species'),
     t('Caligus - Lab'),
     t('Chalimus - Field'),
+    t('Total lice'),
     t('Species - Lab'));
 
   $form['form'] = array(
     '#type' => 'fieldset',
     '#title' => t('Search details'),
-  ); 
+  );
 
   $select = db_select('bamp_field_results', 'f')
-          ->extend('TableSort')
-          ->extend("PagerDefault")
-          ->limit($page_limit);
-  
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+
   if ($species_id == "") {
     $species_id = NULL;
   }
-  
+
   if ($trip_id == "") {
     $trip_id = NULL;
   }
-  
+
   if ($site_id == "") {
     $site_id = NULL;
   }
-  
+
   if ($species_id !== NULL) {
-         $select->condition('f.species', $species_id, '=');
+    $select->condition('f.species', $species_id, '=');
   }
-  
+
   if ($trip_id !== NULL) {
-         $select->condition('f.trip_id', $trip_id, '=');
+    $select->condition('f.trip_id', $trip_id, '=');
   }
-  
+
   if ($site_id !== NULL) {
-         $select->condition('f.site_name', $site_id, '=');
+    $select->condition('f.site_name', $site_id, '=');
   }
-  
+
   $form['form']['details'] = array(
-        '#markup' => $species_message . $trip_message . $site_message,
-      );
-  
+    '#markup' => $species_message . $trip_message . $site_message,
+  );
+
   $select->leftJoin('bamp_lab_results', 'l', 'f.fish_id = l.fish_id');
   $select->addField('f', 'id');
   $select->addField('f', 'fish_id');
   $select->addField('f', 'trip_id');
   $select->addField('f', 'site_name');
+  $select->addField('f', 'lab');
   $select->addField('f', 'date');
+  $select->addField('f', 'crew');
   $select->addField('f', 'species');
   $select->addField('l', 'caligus');
   $select->addField('f', 'chalimus');
+  $select->addField('f', 'total_lice');
   $select->addField('l', 'species');
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
   $rows = array();
-  
+
   foreach ($entries as $result) {
 
     $rows[] = array_map('check_plain', $result);
   }
-  
+
   if ($rows == NULL) {
     $form['form']['none'] = array(
       '#markup' => '<p><h1>No results found</h1></p>',
@@ -229,55 +238,64 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
       '#rows' => $rows,
     );
 
-  $sum_chalimus = 0;
+    $sum_chalimus = bamp_sum('chalimus', $rows);
 
-  $list_no = count($rows);
+    $ave_chalimus = $sum_chalimus / $page_limit;
 
-  for ($i = 0; $i < $list_no; $i++) {
+    $sum_caligus = bamp_sum('caligus', $rows);
 
-    $sum_chalimus += $rows[$i]['chalimus'];
+    $ave_caligus = $sum_caligus / $page_limit;
+
+    $sum_total_lice = bamp_sum('total_lice', $rows);
+
+    $ave_total_lice = $sum_total_lice / $page_limit;
+
+    $sum = array(
+      array('sum' => 'Total',
+        'two' => 'N/A',
+        'three' => 'N/A',
+        'four' => 'N/A',
+        'five' => 'N/A',
+        'six' => 'N/A',
+        'caligus' => $sum_caligus,
+        'chalimus' => $sum_chalimus,
+        'total_lice' => $sum_total_lice,
+        'nine' => 'N/A'),
+      array('sum' => 'Average',
+        'two' => 'N/A',
+        'three' => 'N/A',
+        'four' => 'N/A',
+        'five' => 'N/A',
+        'six' => 'N/A',
+        'caligus' => $ave_caligus,
+        'chalimus' => $ave_chalimus,
+        'total_lice' => $ave_total_lice,
+        'nine' => 'N/A'));
+
+    $header_calc = array(
+      t(''),
+      t('Fish ID'),
+      t('Trip ID'),
+      t('Site ID'),
+      t('Date'),
+      t('Species'),
+      t('Caligus - Lab'),
+      t('Chalimus - Field'),
+      t('Total lice'),
+      t('Species - Lab'));
+
+    $form['sum'] = array(
+      '#theme' => 'table',
+      '#header' => $header_calc,
+      '#rows' => $sum,
+    );
+
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
   }
 
-  $ave_chalimus = $sum_chalimus / $page_limit;
-
-  $sum_caligus = 0;
-
-  for ($i = 0; $i < $list_no; $i++) {
-
-    $sum_caligus += $rows[$i]['caligus'];
-  }
-
-  $ave_caligus = $sum_caligus / $page_limit;
-
-  $sum = array(
-    array('sum' => 'Total', 'two' => 'N/A', 'three' => 'N/A', 'four' => 'N/A', 'five' => 'N/A', 'six' => 'N/A', 'caligus' => $sum_caligus, 'chalimus' => $sum_chalimus, 'nine' => 'N/A'),
-    array('sum' => 'Average', 'two' => 'N/A', 'three' => 'N/A', 'four' => 'N/A', 'five' => 'N/A', 'six' => 'N/A', 'caligus' => $ave_caligus, 'chalimus' => $ave_chalimus, 'nine' => 'N/A'));
-
-//  var_dump($sum);
-
-  $header_calc = array(
-    t(''),
-    t('Fish ID'),
-    t('Trip ID'),
-    t('Site ID'),
-    t('Date'),
-    t('Species'),
-    t('Caligus - Lab'),
-    t('Chalimus - Field'),
-    t('Species - Lab'));
-
-  $form['sum'] = array(
-    '#theme' => 'table',
-    '#header' => $header_calc,
-    '#rows' => $sum,
-  );
-
-  $form['pager'] = array(
-    '#theme' => 'pager',
-    '#quantity' => 10,
-  );
-  }
-  
   return $form;
 }
 

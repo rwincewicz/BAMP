@@ -304,6 +304,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $lab_id = $aa[$j][6];
     $samp_id = $aa[$j][8];
     $comm = $aa[$j][25];
+    $tlice = $aa[$j][12];
 
     drupal_set_message(t('Result ID: ' . $rid));
     drupal_set_message(t('Site name: ' . $site_name));
@@ -318,6 +319,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     drupal_set_message(t('Blind no: ' . $blind_no));
     drupal_set_message(t('Lab: ' . $lab_id));
     drupal_set_message(t('Comments: ' . $comm));
+    drupal_set_message(t('Total lice: ' . $tlice));
 
     $sample = db_insert('bamp_field_results')
         ->fields(array(
@@ -334,6 +336,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
           'crew' => $crew,
           'comments' => $comm,
           'date' => $date,
+          'total_lice' => $tlice,
           
 //              'scarring' => '0',
 //              'pre_adult' => $pre,          
