@@ -98,7 +98,7 @@ function bamprepfarm_menu_callback() {
 }
 
 function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
-  drupal_set_title(t('Results report form'));
+  drupal_set_title(t('Combined results report form'));
 
   if ($species_id == NULL) {
     $species_message = 'Species: All<br />';
@@ -150,7 +150,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
   $form = array();
 
   $page_limit = 20;
-
+  
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -160,6 +160,8 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
     t('Date'),
     t('Crew'),
     t('Species'),
+    t('Weight/kg'),
+    t('Length/mm'),
     t('Caligus - Lab'),
     t('Chalimus - Field'),
     t('Total lice'),
@@ -212,6 +214,8 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
   $select->addField('f', 'date');
   $select->addField('f', 'crew');
   $select->addField('f', 'species');
+  $select->addField('l', 'weight');
+  $select->addField('l', 'length');
   $select->addField('l', 'caligus');
   $select->addField('f', 'chalimus');
   $select->addField('f', 'total_lice');
@@ -393,4 +397,378 @@ function bamprepsite_form($form, &$form_state) {
 
 function bamprepsite_menu_callback() {
   return drupal_get_form('bamprepsite_form');
+}
+
+function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id) {
+  drupal_set_title(t('Field results report form'));
+
+  if ($species_id == NULL) {
+    $species_message = 'Species: All<br />';
+  }
+  else {
+    $species_message = 'Species: ' . $species_id . '<br />';
+  }
+
+  if ($trip_id == NULL) {
+    $trip_message = 'Trip: All<br />';
+  }
+  else {
+    $trip_message = 'Trip: ' . $trip_id . '<br />';
+  }
+
+  if ($site_id == NULL) {
+    $site_message = 'Site: All<br />';
+  }
+  else {
+    $site_message = 'Site: ' . $site_id . '<br />';
+  }
+
+  // Check if there is sorting request
+  if (isset($_GET['sort']) && isset($_GET['order'])) {
+    // Sort it Ascending or Descending?
+    if ($_GET['sort'] == 'asc')
+      $sort = 'ASC';
+    else
+      $sort = 'DESC';
+
+    // Which column will be sorted
+    switch ($_GET['order']) {
+      case 'Result ID':
+        $order = 'id';
+        break;
+      case 'Fish ID':
+        $order = 'fish_id';
+        break;
+      default:
+        $order = 'id';
+    }
+  }
+  else {
+    // Default sort
+    $sort = 'ASC';
+    $order = 'id';
+  }
+
+  $form = array();
+
+  $page_limit = 20;
+  
+  $header = array(
+    array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Fish ID'), 'field' => 'fish_id'),
+    t('Trip ID'),
+    t('Site ID'),
+    t('Lab'),
+    t('Date'),
+    t('Crew'),
+    t('Species'),
+//    t('Caligus'),
+    t('Chalimus'),
+    t('Total lice'));
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Search details'),
+  );
+
+  $select = db_select('bamp_field_results', 'f')
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+
+  if ($species_id == "") {
+    $species_id = NULL;
+  }
+
+  if ($trip_id == "") {
+    $trip_id = NULL;
+  }
+
+  if ($site_id == "") {
+    $site_id = NULL;
+  }
+
+  if ($species_id !== NULL) {
+    $select->condition('f.species', $species_id, '=');
+  }
+
+  if ($trip_id !== NULL) {
+    $select->condition('f.trip_id', $trip_id, '=');
+  }
+
+  if ($site_id !== NULL) {
+    $select->condition('f.site_name', $site_id, '=');
+  }
+
+  $form['form']['details'] = array(
+    '#markup' => $species_message . $trip_message . $site_message,
+  );
+
+  $select->addField('f', 'id');
+  $select->addField('f', 'fish_id');
+  $select->addField('f', 'trip_id');
+  $select->addField('f', 'site_name');
+  $select->addField('f', 'lab');
+  $select->addField('f', 'date');
+  $select->addField('f', 'crew');
+  $select->addField('f', 'species');
+//  $select->addField('f', 'caligus');
+  $select->addField('f', 'chalimus');
+  $select->addField('f', 'total_lice');
+  $select->orderBy($order, $sort);
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  $rows = array();
+
+  foreach ($entries as $result) {
+
+    $rows[] = array_map('check_plain', $result);
+  }
+
+  if ($rows == NULL) {
+    $form['form']['none'] = array(
+      '#markup' => '<p><h1>No results found</h1></p>',
+    );
+  }
+  else {
+    $form['Form'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+    );
+
+    $sum_chalimus = bamp_sum('chalimus', $rows);
+
+    $ave_chalimus = $sum_chalimus / $page_limit;
+
+//    $sum_caligus = bamp_sum('caligus', $rows);
+//
+//    $ave_caligus = $sum_caligus / $page_limit;
+
+    $sum_total_lice = bamp_sum('total_lice', $rows);
+
+    $ave_total_lice = $sum_total_lice / $page_limit;
+
+    $sum = array(
+      array('sum' => 'Total',
+//        'caligus' => $sum_caligus,
+        'chalimus' => $sum_chalimus,
+        'total_lice' => $sum_total_lice),
+      array('sum' => 'Average',
+//        'caligus' => $ave_caligus,
+        'chalimus' => $ave_chalimus,
+        'total_lice' => $ave_total_lice));
+
+    $header_calc = array(
+      t(''),
+//      t('Caligus'),
+      t('Chalimus'),
+      t('Total lice'));
+
+    $form['sum'] = array(
+      '#theme' => 'table',
+      '#header' => $header_calc,
+      '#rows' => $sum,
+    );
+
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
+  }
+
+  return $form;
+}
+
+function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
+  return drupal_get_form('bamprepfield_form', $species_id, $trip_id, $site_id);
+}
+
+function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
+  drupal_set_title(t('Lab results report form'));
+
+  if ($species_id == NULL) {
+    $species_message = 'Species: All<br />';
+  }
+  else {
+    $species_message = 'Species: ' . $species_id . '<br />';
+  }
+
+  if ($trip_id == NULL) {
+    $trip_message = 'Trip: All<br />';
+  }
+  else {
+    $trip_message = 'Trip: ' . $trip_id . '<br />';
+  }
+
+  if ($lab == NULL) {
+    $lab_message = 'Lab: All<br />';
+  }
+  else {
+    $lab_message = 'Lab: ' . $lab . '<br />';
+  }
+
+  // Check if there is sorting request
+  if (isset($_GET['sort']) && isset($_GET['order'])) {
+    // Sort it Ascending or Descending?
+    if ($_GET['sort'] == 'asc')
+      $sort = 'ASC';
+    else
+      $sort = 'DESC';
+
+    // Which column will be sorted
+    switch ($_GET['order']) {
+      case 'Result ID':
+        $order = 'id';
+        break;
+      case 'Fish ID':
+        $order = 'fish_id';
+        break;
+      default:
+        $order = 'id';
+    }
+  }
+  else {
+    // Default sort
+    $sort = 'ASC';
+    $order = 'id';
+  }
+
+  $form = array();
+
+  $page_limit = 20;
+  
+  $header = array(
+    array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Fish ID'), 'field' => 'fish_id'),
+    t('Trip ID'),
+    t('Lab'),
+    t('Date'),
+    t('Group ID'),
+    t('Species'),
+    t('Weight/kg'),
+    t('Length/mm'),
+    t('Caligus'),
+    t('Chalimus'),
+    t('Total lice'),
+    t('Species'));
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Search details'),
+  );
+
+  $select = db_select('bamp_lab_results', 'l')
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+
+  if ($species_id == "") {
+    $species_id = NULL;
+  }
+
+  if ($trip_id == "") {
+    $trip_id = NULL;
+  }
+
+  if ($lab == "") {
+    $lab = NULL;
+  }
+
+  if ($species_id !== NULL) {
+    $select->condition('l.species', $species_id, '=');
+  }
+
+  if ($trip_id !== NULL) {
+    $select->condition('l.trip_id', $trip_id, '=');
+  }
+
+  if ($lab !== NULL) {
+    $select->condition('l.lab', $lab, '=');
+  }
+
+  $form['form']['details'] = array(
+    '#markup' => $species_message . $trip_message . $lab_message,
+  );
+
+  $select->addField('l', 'id');
+  $select->addField('l', 'fish_id');
+  $select->addField('l', 'trip_id');
+  $select->addField('l', 'lab');
+  $select->addField('l', 'date');
+  $select->addField('l', 'group_id');
+  $select->addField('l', 'species');
+  $select->addField('l', 'weight');
+  $select->addField('l', 'length');
+  $select->addField('l', 'caligus');
+  $select->addField('l', 'chalimus');
+  $select->addField('l', 'total_lice');
+  $select->addField('l', 'species');
+  $select->orderBy($order, $sort);
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  $rows = array();
+
+  foreach ($entries as $result) {
+
+    $rows[] = array_map('check_plain', $result);
+  }
+
+  if ($rows == NULL) {
+    $form['form']['none'] = array(
+      '#markup' => '<p><h1>No results found</h1></p>',
+    );
+  }
+  else {
+    $form['Form'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+    );
+
+    $sum_chalimus = bamp_sum('chalimus', $rows);
+
+    $ave_chalimus = $sum_chalimus / $page_limit;
+
+    $sum_caligus = bamp_sum('caligus', $rows);
+
+    $ave_caligus = $sum_caligus / $page_limit;
+
+    $sum_total_lice = bamp_sum('total_lice', $rows);
+
+    $ave_total_lice = $sum_total_lice / $page_limit;
+
+    $sum = array(
+      array('sum' => 'Total',
+        'caligus' => $sum_caligus,
+        'chalimus' => $sum_chalimus,
+        'total_lice' => $sum_total_lice),
+      array('sum' => 'Average',
+        'caligus' => $ave_caligus,
+        'chalimus' => $ave_chalimus,
+        'total_lice' => $ave_total_lice));
+
+    $header_calc = array(
+      t(''),
+      t('Caligus'),
+      t('Chalimus'),
+      t('Total lice'));
+
+    $form['sum'] = array(
+      '#theme' => 'table',
+      '#header' => $header_calc,
+      '#rows' => $sum,
+    );
+
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
+  }
+
+  return $form;
+}
+
+function bampreplab_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
+  return drupal_get_form('bampreplab_form', $species_id, $trip_id, $site_id);
 }

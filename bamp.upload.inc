@@ -77,17 +77,9 @@ function bampupcsv_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
-//  $file_handle = fopen($csv_file_path, 'r');
-//  
-//  $csv_line = fgetcsv($file_handle);
-//  $csv_line2 = fgetcsv($file_handle);
-//  
-//  $site = $csv_line[3];
-//  $tfish = $csv_line[10];
 
   $aa = csv2aa($csv_file_path, ',');
-
-  //try {
+  
   // Variables common to all the sample batches in the file
   $site = $aa[0][3];
   $tfish = $aa[0][10];
@@ -528,7 +520,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
 
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
   
-  for ($j = 1; $j <= 20; $j++) {
+  for ($j = 1; $j <= $na; $j++) {
 
     $lrid = next_id('bamp_lab_results');
     $fid = $aa[$j][0];
@@ -540,6 +532,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $lspecies = $aa[$j][7];
     $length = $aa[$j][8];
     $weight = $aa[$j][9];
+    $total_lice = $aa[$j][30];
     $comm = $aa[$j][32];
     
     if ($lspecies == '') {
@@ -556,6 +549,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     drupal_set_message(t('Lab Species: ' . $lspecies));
     drupal_set_message(t('Length: ' . $length));
     drupal_set_message(t('Weight: ' . $weight));
+    drupal_set_message(t('Total lice: ' . $total_lice));
     drupal_set_message(t('Comments: ' . $comm));
 
     $sample = db_insert('bamp_lab_results')
@@ -564,10 +558,12 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
           'fish_id' => $fid,
           'trip_id' => $trip_id,
           'group_id' => $group_id,
+          'lab' => $lab,
           'date' => $date,
           'species' => $lspecies,
           'length' => $length,
           'weight' => $weight,
+          'total_lice' => $total_lice,
           'comments' => $comm,
         ))
         ->execute();

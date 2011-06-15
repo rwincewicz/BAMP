@@ -120,11 +120,23 @@ function bamp_menu() {
   );
   
   $items['bamp/Report forms/Results'] = array(
-    'title' => 'Results report',
+    'title' => 'Combined results report',
     'page callback' => 'bamprepres_menu_callback',
     'access callback' => TRUE,
   );
 
+  $items['bamp/Report forms/Field results'] = array(
+    'title' => 'Field results report',
+    'page callback' => 'bamprepfield_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Report forms/Lab results'] = array(
+    'title' => 'Lab results report',
+    'page callback' => 'bampreplab_menu_callback',
+    'access callback' => TRUE,
+  );
+  
   $items['bamp/Report forms/Sites'] = array(
     'title' => 'Sites report',
     'page callback' => 'bamprepsite_menu_callback',
