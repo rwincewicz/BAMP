@@ -136,7 +136,7 @@ function r_implode( $glue1, $glue2, $pieces )
     		}
     		else	
     		{
-      			$retVal[] = $r_pieces;
+      			$retVal[] = (int)$r_pieces;
     		}
   	}
   	return implode( $glue1, $retVal );
