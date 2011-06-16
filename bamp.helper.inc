@@ -125,3 +125,19 @@ function bamp_sum($field, $rows) {
 
   return $sum;
 }
+
+function r_implode( $glue1, $glue2, $pieces )
+{
+	foreach( $pieces as $r_pieces )
+	{
+    		if( is_array( $r_pieces ) )
+    		{
+      			$retVal[] = r_implode( $glue2, $glue2, $r_pieces );
+    		}
+    		else	
+    		{
+      			$retVal[] = $r_pieces;
+    		}
+  	}
+  	return implode( $glue1, $retVal );
+} 

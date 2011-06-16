@@ -10,6 +10,7 @@ include 'bamp.input.inc';
 include 'bamp.upload.inc';
 include 'bamp.output.inc';
 include 'bamp.search.inc';
+include 'bamp.chart.inc';
 
 function bamp_views_api() {
   return array(
@@ -152,6 +153,24 @@ function bamp_menu() {
   $items['bamp/Search forms/Results'] = array(
     'title' => 'Search Results',
     'page callback' => 'bamp_search_results_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Charts'] = array(
+    'title' => 'Charts',
+    'page callback' => 'bamp_charts_menu_callback',
+    'access callback' => TRUE,
+  );
+
+  $items['bamp/Charts/Chart1'] = array(
+    'title' => 'Chart1',
+    'page callback' => 'bamp_charts1_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Charts/Chart2'] = array(
+    'title' => 'Chart2',
+    'page callback' => 'bamp_charts2_menu_callback',
     'access callback' => TRUE,
   );
   

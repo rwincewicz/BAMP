@@ -97,7 +97,7 @@ function bamprepfarm_menu_callback() {
   return drupal_get_form('bamprepfarm_form');
 }
 
-function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
+function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
   drupal_set_title(t('Combined results report form'));
 
   if ($species_id == NULL) {
@@ -149,8 +149,6 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
 
   $form = array();
 
-  $page_limit = 20;
-  
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -172,10 +170,18 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
     '#title' => t('Search details'),
   );
 
+  if ($no_results == 'all') {
+    $list_no = next_id('bamp_field_results');
+    $no_message = 'Showing all results</br>';
+  } else {
+    $list_no = $no_results;
+    $no_message = 'Showing ' . $no_results . ' results per page </br>';
+  }
+  
   $select = db_select('bamp_field_results', 'f')
       ->extend('TableSort')
       ->extend("PagerDefault")
-      ->limit($page_limit);
+      ->limit($list_no);
 
   if ($species_id == "") {
     $species_id = NULL;
@@ -202,7 +208,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
   }
 
   $form['form']['details'] = array(
-    '#markup' => $species_message . $trip_message . $site_message,
+    '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
 
   $select->leftJoin('bamp_lab_results', 'l', 'f.fish_id = l.fish_id');
@@ -242,51 +248,51 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
       '#rows' => $rows,
     );
 
+    if ($no_results == 'all') {
+      $no_results = count($rows);
+    }
+    
+    $sum_weight = bamp_sum('weight', $rows);
+
+    $ave_weight = round($sum_weight / $no_results, 2);
+
+    $sum_length = bamp_sum('length', $rows);
+
+    $ave_length = round($sum_length / $no_results, 2);
+
     $sum_chalimus = bamp_sum('chalimus', $rows);
 
-    $ave_chalimus = $sum_chalimus / $page_limit;
+    $ave_chalimus = round($sum_chalimus / $no_results, 2);
 
     $sum_caligus = bamp_sum('caligus', $rows);
 
-    $ave_caligus = $sum_caligus / $page_limit;
+    $ave_caligus = round($sum_caligus / $no_results, 2);
 
     $sum_total_lice = bamp_sum('total_lice', $rows);
 
-    $ave_total_lice = $sum_total_lice / $page_limit;
+    $ave_total_lice = round($sum_total_lice / $no_results, 2);
 
     $sum = array(
       array('sum' => 'Total',
-        'two' => 'N/A',
-        'three' => 'N/A',
-        'four' => 'N/A',
-        'five' => 'N/A',
-        'six' => 'N/A',
+        'weight' => $sum_weight,
+        'length' => $sum_length,
         'caligus' => $sum_caligus,
         'chalimus' => $sum_chalimus,
-        'total_lice' => $sum_total_lice,
-        'nine' => 'N/A'),
+        'total_lice' => $sum_total_lice),
       array('sum' => 'Average',
-        'two' => 'N/A',
-        'three' => 'N/A',
-        'four' => 'N/A',
-        'five' => 'N/A',
-        'six' => 'N/A',
+        'weight' => $ave_weight,
+        'length' => $ave_length,
         'caligus' => $ave_caligus,
         'chalimus' => $ave_chalimus,
-        'total_lice' => $ave_total_lice,
-        'nine' => 'N/A'));
+        'total_lice' => $ave_total_lice));
 
     $header_calc = array(
       t(''),
-      t('Fish ID'),
-      t('Trip ID'),
-      t('Site ID'),
-      t('Date'),
-      t('Species'),
+      t('Weight/kg'),
+      t('Length/mm'),
       t('Caligus - Lab'),
       t('Chalimus - Field'),
-      t('Total lice'),
-      t('Species - Lab'));
+      t('Total lice'));
 
     $form['sum'] = array(
       '#theme' => 'table',
@@ -303,8 +309,8 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id) {
   return $form;
 }
 
-function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
-  return drupal_get_form('bamprepres_form', $species_id, $trip_id, $site_id);
+function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20) {
+  return drupal_get_form('bamprepres_form', $species_id, $trip_id, $site_id, $no_results);
 }
 
 /**
@@ -452,7 +458,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id)
   $form = array();
 
   $page_limit = 20;
-  
+
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -637,7 +643,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   $form = array();
 
   $page_limit = 20;
-  
+
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -726,6 +732,14 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
       '#rows' => $rows,
     );
 
+    $sum_weight = bamp_sum('weight', $rows);
+
+    $ave_weight = round($sum_weight / $page_limit, 2);
+
+    $sum_length = bamp_sum('length', $rows);
+
+    $ave_length = round($sum_length / $page_limit, 2);
+    
     $sum_chalimus = bamp_sum('chalimus', $rows);
 
     $ave_chalimus = $sum_chalimus / $page_limit;
@@ -740,16 +754,22 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
 
     $sum = array(
       array('sum' => 'Total',
+        'weight' => $sum_weight,
+        'length' => $sum_length,
         'caligus' => $sum_caligus,
         'chalimus' => $sum_chalimus,
         'total_lice' => $sum_total_lice),
       array('sum' => 'Average',
+        'weight' => $ave_weight,
+        'length' => $ave_length,
         'caligus' => $ave_caligus,
         'chalimus' => $ave_chalimus,
         'total_lice' => $ave_total_lice));
 
     $header_calc = array(
       t(''),
+      t('Weight/kg'),
+      t('Length/mm'),
       t('Caligus'),
       t('Chalimus'),
       t('Total lice'));

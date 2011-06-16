@@ -1,23 +1,21 @@
 <?php
 
-/**
- *  Create top-level search menu page
- */
+include 'charts/php-ofc-library/open-flash-chart.php';
 
-function bamp_search_form($form_state) {
-  drupal_set_title(t('Search menu'));
+function bamp_chart_form($form_state) {
+  drupal_set_title(t('Chart menu'));
 
   $form = array();
 
   $content['form'] = array(
-    '#markup' => '<p>This is the BAMP search menu</p>',
+    '#markup' => '<p>This is the BAMP chart menu</p>',
   );
 
   return $form;
 }
 
-function bamp_search_menu_callback() {
-  return drupal_get_form('bamp_search_form');
+function bamp_charts_menu_callback() {
+  return drupal_get_form('bamp_chart_form');
 }
 
 /**
@@ -27,11 +25,11 @@ function bamp_search_menu_callback() {
  * @return type 
  */
 
-function bamp_search_results_form($form, &$form_state) {
-  drupal_set_title(t('Results search form'));
-
+function bamp_charts1_form($form, &$form_state) {
+  drupal_set_title(t('Chart 1'));
+  
   $form = array();
-
+  
   $form['form'] = array(
     '#type' => 'fieldset',
     '#title' => t('Search details'),
@@ -86,18 +84,16 @@ function bamp_search_results_form($form, &$form_state) {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Search'),
+    '#value' => t('Chart'),
   );
-
+  
   return $form;
 }
 
-function bamp_search_results_menu_callback() {
-  return drupal_get_form('bamp_search_results_form');
-}
-
-function bamp_search_results_form_submit($form, &$form_state) {
+function bamp_charts1_form_submit($form, &$form_state) {
  
+  $file = 'data.json';
+  
   $species_id = $form_state['values']['species'];
  
   $species = db_select('bamp_field_results', 'r')
@@ -130,5 +126,52 @@ function bamp_search_results_form_submit($form, &$form_state) {
     $no_results = $form_state['values']['list_no']; 
   }
   
-  drupal_goto('bamp/Report forms/Results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results);
+  drupal_goto('bamp/Charts/Chart2/' . $file);
+}
+
+function bamp_charts1_menu_callback() {
+  return drupal_get_form('bamp_charts1_form');
+}
+
+function bamp_charts2_form($form, &$form_state) {
+  drupal_set_title(t('Chart 2'));
+  
+  $title = new title(t('BAMP chart'));
+
+$bar = new pie();
+$bar->set_values( array(9,8,7,6,10,4,3,2,1) );
+//$bar->set_colour( '#94D700' );
+
+$chart = new open_flash_chart();
+$chart->set_title( $title );
+$chart->add_element( $bar );
+
+$data = $chart->toPrettyString();
+  
+  drupal_add_js('sites/default/modules/bamp/charts/js/json/json2.js');
+  drupal_add_js('sites/default/modules/bamp/charts/js/swfobject.js');
+  $chart_data = '<script type="text/javascript">
+  swfobject.embedSWF("sites/default/modules/bamp/charts/open-flash-chart.swf", "div_chart", "300", "300", "9.0.0", "expressInstall.swf", {"get-data":"get_data_1"} );
+ 
+function ofc_ready() {}
+ 
+function get_data_1()
+{
+	return JSON.stringify(data);
+}
+ 
+var data = ' . $data . ';
+</script>';
+  
+  $form = array();
+
+$form['form'] = array(
+    '#markup' => $chart_data . '<div id="div_chart"></div>',
+  );
+
+  return $form;
+}
+
+function bamp_charts2_menu_callback() {
+  return drupal_get_form('bamp_charts2_form');
 }
