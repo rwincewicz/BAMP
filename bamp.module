@@ -11,6 +11,7 @@ include 'bamp.upload.inc';
 include 'bamp.output.inc';
 include 'bamp.search.inc';
 include 'bamp.chart.inc';
+include 'bamp.map.inc';
 
 function bamp_views_api() {
   return array(
@@ -107,6 +108,12 @@ function bamp_menu() {
     'page callback' => 'bampupcrawlabr_menu_callback',
     'access callback' => TRUE,
   );
+  
+  $items['bamp/Upload forms/Marty field results CSV upload'] = array(
+    'title' => 'Marty field results CSV upload',
+    'page callback' => 'bampupmartyfield_menu_callback',
+    'access callback' => TRUE,
+  );
 
   $items['bamp/Report forms'] = array(
     'title' => 'Report Forms',
@@ -171,6 +178,18 @@ function bamp_menu() {
   $items['bamp/Charts/Chart2'] = array(
     'title' => 'Chart2',
     'page callback' => 'bamp_charts2_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Maps'] = array(
+    'title' => 'Maps',
+    'page callback' => 'bamp_maps_menu_callback',
+    'access callback' => TRUE,
+  );
+
+  $items['bamp/Maps/Maps1'] = array(
+    'title' => 'Maps1',
+    'page callback' => 'bamp_maps1_menu_callback',
     'access callback' => TRUE,
   );
   

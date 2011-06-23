@@ -282,36 +282,42 @@ function bampupcrawfield_form_submit($form, &$form_state) {
   for ($j = 1; $j <= $na; $j++) {
 
     $rid = next_id('bamp_field_results');
-    $nid = $rid;
-    $site = $aa[$j][7];
-    $site_name = trim(str_replace("  ", " ", $site));
-    $method = '0';
-    $date = $aa[$j][3];
-    $crew = $aa[$j][9];
+    
+    
     $fid = $aa[$j][0];
     $trip_id = $aa[$j][1];
     $species = $aa[$j][2];
+    $date = $aa[$j][3];
     $set_no = $aa[$j][4];
     $blind_no = $aa[$j][5];
     $lab_id = $aa[$j][6];
+    $site = $aa[$j][7];
+    
+    $site_name = trim(str_replace("  ", " ", $site));
+    
     $samp_id = $aa[$j][8];
-    $comm = $aa[$j][25];
+    $crew = $aa[$j][9];
+    $scar_chal = $aa[$j][10];
+    $scar_mob = $aa[$j][11];
     $tlice = $aa[$j][12];
-
-    drupal_set_message(t('Result ID: ' . $rid));
-    drupal_set_message(t('Site name: ' . $site_name));
-    drupal_set_message(t('Date: ' . $date));
-    drupal_set_message(t('Sample number: ' . $samp_id));
-    drupal_set_message(t('Method: ' . $method));
-    drupal_set_message(t('Crew: ' . $crew));
-    drupal_set_message(t('Fish ID: ' . $fid));
-    drupal_set_message(t('Trip ID: ' . $trip_id));
-    drupal_set_message(t('Species: ' . $species));
-    drupal_set_message(t('Set no: ' . $set_no));
-    drupal_set_message(t('Blind no: ' . $blind_no));
-    drupal_set_message(t('Lab: ' . $lab_id));
-    drupal_set_message(t('Comments: ' . $comm));
-    drupal_set_message(t('Total lice: ' . $tlice));
+    $total_cop = $aa[$j][13];
+    $total_chal = $aa[$j][14];
+    $lep_pre_male = $aa[$j][15];
+    $lep_pre_female = $aa[$j][16];
+    $total_lep_pre = $lep_pre_male + $lep_pre_female;
+    $lep_adult_male = $aa[$j][17];
+    $lep_adult_female = $aa[$j][18];
+    $total_lep_adult = $lep_adult_male + $lep_adult_female;
+    $total_lep = $lep_pre_male + $lep_pre_female + $lep_adult_male + $lep_adult_female;
+    $cal_pre_male = $aa[$j][20];
+    $cal_pre_female = $aa[$j][21];
+    $total_cal_pre = $cal_pre_male + $cal_pre_female;
+    $cal_adult_male = $aa[$j][22];
+    $cal_adult_female = $aa[$j][23];
+    $total_cal_adult = $cal_adult_male + $cal_adult_female;
+    $total_cal = $cal_pre_male + $cal_pre_female + $cal_adult_male + $cal_adult_female;
+    $comm = $aa[$j][25];
+    $total_motile = $total_cal_pre + $total_cal_adult + $total_lep_pre + $total_lep_adult;
 
     $sample = db_insert('bamp_field_results')
         ->fields(array(
@@ -322,35 +328,34 @@ function bampupcrawfield_form_submit($form, &$form_state) {
           'species' => $species,
           'set_no' => $set_no,
           'blind_no' => $blind_no,
-          'lab' => $lab_id,
+          'to_lab' => $lab_id,
           'site_name' => $site_name,
-          'method' => $method,
           'crew' => $crew,
           'comments' => $comm,
           'date' => $date,
           'total_lice' => $tlice,
-          
-//              'scarring' => '0',
-//              'pre_adult' => $pre,          
-//              'caligus' => $cal,
-//              'chalimus' => $chal,
-//              'pre_adult' => $pre,
-//              'female' => $female,
-//              'gravid' => $grav,              
-//              'male' => $male,
-//              'pen' => $pen,
-//              'tot_fish' => $tfish,
-//              'size' => $size,
+          'scar_chal' => $scar_chal,
+          'scar_mob' => $scar_mob,
+          'total_cop' => $total_cop,
+          'total_chal' => $total_chal,
+          'lep_pre_male' => $lep_pre_male,
+          'lep_pre_female' => $lep_pre_female,
+          'total_lep_pre' => $total_lep_pre,
+          'lep_adult_male' => $lep_adult_male,
+          'lep_adult_female' => $lep_adult_female,
+          'total_lep_adult' => $total_lep_adult,
+          'total_lep' => $total_lep,
+          'cal_pre_male' => $cal_pre_male,
+          'cal_pre_female' => $cal_pre_female,
+          'total_cal_pre' => $total_cal_pre,
+          'cal_adult_male' => $cal_adult_male,
+          'cal_adult_female' => $cal_adult_female,
+          'total_cal_adult' => $total_cal_adult,
+          'total_cal' => $total_cal,
+          'total_motile' => $total_motile,
         ))
         ->execute();
 
-//    if (check_node($nid) == FALSE) {
-//      dummy_node($form, $form_state, $nid);
-//      drupal_set_message(t('Dummy node doesn\'t exist, creating'));
-//    }
-//    else {
-//      drupal_set_message(t('Dummy node already exists'));
-//    }
   }
 
   drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
@@ -427,14 +432,6 @@ function bampupcrawsite_form_submit($form, &$form_state) {
     $lon = $aa[$j][3];
     $zone = $aa[$j][4];
     $area = $aa[$j][5];
-
-//        drupal_set_message(t('Site: ' . $name));
-//        drupal_set_message(t('Site ID: ' . $sid));
-//        drupal_set_message(t('Site ID Crawford: ' . $craw_site_id));
-//        drupal_set_message(t('Latitude: ' . $lat));
-//        drupal_set_message(t('Longitude: ' . $lon));
-//        drupal_set_message(t('Zone: ' . $zone));
-//        drupal_set_message(t('Area: ' . $area));
 
     $sample = db_insert('bamp_sites')
         ->fields(array(
@@ -571,4 +568,159 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
 
   drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
   
+}
+
+/**
+ * Create BAMP CSV upload form for Marty data
+ */
+function bampupmartyfield_form($form_state) {
+  drupal_set_title(t('Marty field CSV upload form'));
+
+  $form = array();
+
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field CSV upload'),
+  );
+
+  $form['form']['csv'] = array(
+    '#type' => 'file',
+    '#title' => t('Select a CSV file'),
+    '#size' => 40,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#executes_submit_callback' => TRUE,
+  );
+
+  return $form;
+}
+
+function bampupmartyfield_menu_callback() {
+  return drupal_get_form('bampupmartyfield_form');
+}
+
+function bampupmartyfield_form_validate($form, &$form_state) {
+
+  $validators = array('file_validate_extensions' => array('csv'));
+  $file = file_save_upload('csv', $validators);
+
+  if (!$file)
+    form_set_error('upload', 'You must select a valid file to upload.');
+  else {
+    // Manually add the uploaded file to the $form_state
+    $form_state['values']['csv']['title'] = $file->filename;
+    $form_state['values']['csv']['file'] = $file;
+    $form_state['values']['csv']['filepath'] = $file->destination;
+  }
+}
+
+function bampupmartyfield_form_submit($form, &$form_state) {
+
+  $csv_file_path = $form_state['values']['csv']['filepath'];
+  $csv_file_name = $form_state['values']['csv']['title'];
+
+  $aa = csv2aa($csv_file_path, ',');
+
+  $na = (count($aa) - 1);
+
+  drupal_set_message(t('There are ' . $na . ' entries in this file'));
+
+  for ($j = 1; $j <= $na; $j++) {
+
+    $rid = next_id('bamp_field_results');
+    
+    $date = $aa[$j][0];
+    $rep = $aa[$j][1];
+    $route = $aa[$j][2];
+    $site_num = $aa[$j][3];
+    $species = $aa[$j][4];
+    $length = $aa[$j][5];
+    $height = $aa[$j][6];
+    $lep_cop = $aa[$j][7];
+    $cal_cop = $aa[$j][8];
+    $total_cop = $lep_cop + $cal_cop;
+    $chal_a = $aa[$j][9];
+    $chal_b = $aa[$j][10];
+    $total_chal = $chal_a + $chal_b;
+    $mot_unid = $aa[$j][11];
+    $lep_pre_male = $aa[$j][12];
+    $lep_pre_female = $aa[$j][13];
+    $lep_pre_unid = $aa[$j][14];
+    $total_lep_pre = $lep_pre_male + $lep_pre_female + $lep_pre_unid;
+    $lep_adult_male = $aa[$j][15];
+    $lep_adult_female = $aa[$j][16];
+    $lep_adult_unid = $aa[$j][17];
+    $lep_gravid = $aa[$j][18];
+    $total_lep_adult = $lep_adult_male + $lep_adult_female + $lep_adult_unid + $lep_gravid;
+    $total_lep = $total_lep_pre + $total_lep_adult;
+    $caligus = $aa[$j][19];
+    $caligus_gravid = $aa[$j][20];
+    $total_cal = $caligus + $caligus_gravid;
+    $chal_scar = $aa[$j][21];
+    $mot_scar = $aa[$j][22];
+    $pred_marks = $aa[$j][23];
+    $hem = $aa[$j][24];
+    $mate_guard = $aa[$j][25];
+    $pin_belly = $aa[$j][26];
+    $tissue_damage = $aa[$j][27];
+    $comm = $aa[$j][28];
+    $total_motile = $total_lep + $total_cal;
+    $total_lice = $total_cop + $total_chal + $total_cal + $total_lep;
+
+    
+    $sample = db_insert('bamp_field_results')
+        ->fields(array(
+          'id' => $rid,
+//          'fish_id' => $fid,
+         
+        
+          'species' => $species,
+         
+          'site_no' => $site_num,
+          'route' => $route,
+          'rep_no' => $rep,
+          'length' => $length,
+          'height' => $height,
+          'comments' => $comm,
+          'date' => $date,
+          'total_lice' => $total_lice,
+          'cop_lep' => $lep_cop,
+          'cop_cal' => $cal_cop,
+          'total_cop' => $total_cop,
+          'chal_a' => $chal_a,
+          'chal_b' => $chal_b,
+          'total_chal' => $total_chal,
+          'mot_unid' => $mot_unid,
+          'lep_pre_male' => $lep_pre_male,
+          'lep_pre_female' => $lep_pre_female,
+          'lep_pre_unid' => $lep_pre_unid,
+          'total_lep_pre' => $total_lep_pre,
+          'lep_adult_male' => $lep_adult_male,
+          'lep_adult_female' => $lep_adult_female,
+          'lep_adult_unid' => $lep_adult_unid,
+          'lep_gravid' => $lep_gravid,
+          'total_lep_adult' => $total_lep_adult,
+          'total_lep' => $total_lep,
+          'caligus' => $caligus,
+          'cal_gravid' => $caligus_gravid,
+          'total_cal' => $total_cal,
+          'scar_mob' => $mot_scar,
+          'scar_chal' => $chal_scar,
+          'pred_mark' => $pred_marks,
+          'hem' => $hem,
+          'mate_guard' => $mate_guard,
+          'pin_belly' => $pin_belly,
+          'tissue_damage' => $tissue_damage,
+          'total_motile' => $total_motile,
+        ))
+        ->execute();
+
+  }
+
+  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
 }

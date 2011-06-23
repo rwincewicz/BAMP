@@ -210,13 +210,18 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
-
+  
+  $form['form']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Download CSV')
+    );
+  
   $select->leftJoin('bamp_lab_results', 'l', 'f.fish_id = l.fish_id');
   $select->addField('f', 'id');
   $select->addField('f', 'fish_id');
   $select->addField('f', 'trip_id');
   $select->addField('f', 'site_name');
-  $select->addField('f', 'lab');
+  $select->addField('f', 'to_lab');
   $select->addField('f', 'date');
   $select->addField('f', 'crew');
   $select->addField('f', 'species');
@@ -304,8 +309,29 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
       '#theme' => 'pager',
       '#quantity' => 10,
     );
+    
   }
-
+  
+  $no = count($header);
+  
+  $result = $header[0]['data'];
+  $result .= ',';
+  $result .= $header[1]['data'];
+  
+  for ($i = 2; $i < $no; $i++) {
+    
+  $result .= ',';
+  $result .= $header[$i];
+  
+  }
+  
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
+  var_dump($result);
+  
   return $form;
 }
 
@@ -313,6 +339,21 @@ function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL
   return drupal_get_form('bamprepres_form', $species_id, $trip_id, $site_id, $no_results);
 }
 
+function bamprepres_form_submit($form, &$form_state) {
+  
+$result = $form_state['values']['data'];
+
+$filename = 'data.csv';
+
+drupal_add_http_header('Content-Type', 'text/csv');
+drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+  
+//  print($result) . "\r\n";
+ 
+  exit; 
+//export_to_csv($data);
+
+}
 /**
  * Report for sites
  */
@@ -463,14 +504,59 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id)
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
     t('Trip ID'),
+    t('Sample ID'),
     t('Site ID'),
-    t('Lab'),
+    t('Set number'),
+    t('Blind number'),
+    t('To Lab'),
     t('Date'),
+    t('Pen'),
+    t('Input name'),
+    t('Route'),
+    t('Site number'),
+    t('Repetition number'),
+    t('Number of fish sampled'),
     t('Crew'),
     t('Species'),
-//    t('Caligus'),
-    t('Chalimus'),
-    t('Total lice'));
+    t('Height/mm'),
+    t('Length/mm'),
+    t('Weight'),
+    t('Lep copepods'),
+    t('Cal copepods'),
+    t('Total copepods'),
+    t('Chalimus a'),
+    t('Chalimus b'),
+    t('Total chalimus'),
+    t('Lep pre-adult male'),
+    t('Lep pre-adult female'),
+    t('Lep pre-adult unidentified'),
+    t('Total lep pre-adult'),
+    t('Lep adult male'),
+    t('Lep adult female'),
+    t('Lep adult gravid'),
+    t('Lep adult unidentified'),
+    t('Total lep adult'),
+    t('Total lep'),
+    t('Caligus pre-adult male'),
+    t('Caligus pre-adult female'),
+    t('Caligus pre-adult unidentified'),
+    t('Total caligus pre-adult'),
+    t('Caligus adult male'),
+    t('Caligus adult female'),
+    t('Caligus adult gravid'),
+    t('Caligus adult unidentified'),
+    t('Total caligus adult'),
+    t('Total caligus'),
+    t('Total motile'),
+    t('Total lice'),
+    t('Scar - chalimus'),
+    t('Scar - motile'),
+    t('Predation marks'),
+    t('Hemorrhaging'),
+    t('Mate guarding'),
+    t('Pinched belly'),
+    t('Tissue damage'),
+    t('Comments'));
 
   $form['form'] = array(
     '#type' => 'fieldset',
@@ -513,14 +599,59 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id)
   $select->addField('f', 'id');
   $select->addField('f', 'fish_id');
   $select->addField('f', 'trip_id');
+  $select->addField('f', 'sample_id');
   $select->addField('f', 'site_name');
-  $select->addField('f', 'lab');
+  $select->addField('f', 'set_no');
+  $select->addField('f', 'blind_no');
+  $select->addField('f', 'to_lab');
   $select->addField('f', 'date');
+  $select->addField('f', 'pen');
+  $select->addField('f', 'input_name');
+  $select->addField('f', 'route');
+  $select->addField('f', 'site_no');
+  $select->addField('f', 'rep_no');
+  $select->addField('f', 'no_sampled');
   $select->addField('f', 'crew');
   $select->addField('f', 'species');
-//  $select->addField('f', 'caligus');
-  $select->addField('f', 'chalimus');
+  $select->addField('f', 'height');
+  $select->addField('f', 'length');
+  $select->addField('f', 'weight');
+  $select->addField('f', 'cop_lep');
+  $select->addField('f', 'cop_cal');
+  $select->addField('f', 'total_cop');
+  $select->addField('f', 'chal_a');
+  $select->addField('f', 'chal_b');
+  $select->addField('f', 'total_chal');
+  $select->addField('f', 'lep_pre_male');
+  $select->addField('f', 'lep_pre_female');
+  $select->addField('f', 'lep_pre_unid');
+  $select->addField('f', 'total_lep_pre');
+  $select->addField('f', 'lep_adult_male');
+  $select->addField('f', 'lep_adult_female');
+  $select->addField('f', 'lep_gravid');
+  $select->addField('f', 'lep_adult_unid');
+  $select->addField('f', 'total_lep_adult');
+  $select->addField('f', 'total_lep');
+  $select->addField('f', 'cal_pre_male');
+  $select->addField('f', 'cal_pre_female');
+  $select->addField('f', 'cal_pre_unid');
+  $select->addField('f', 'total_cal_pre');
+  $select->addField('f', 'cal_adult_male');
+  $select->addField('f', 'cal_adult_female');
+  $select->addField('f', 'cal_gravid');
+  $select->addField('f', 'cal_adult_unid');
+  $select->addField('f', 'total_cal_adult');
+  $select->addField('f', 'total_cal');
+  $select->addField('f', 'total_motile');
   $select->addField('f', 'total_lice');
+  $select->addField('f', 'scar_chal');
+  $select->addField('f', 'scar_mob');
+  $select->addField('f', 'pred_mark');
+  $select->addField('f', 'hem');
+  $select->addField('f', 'mate_guard');
+  $select->addField('f', 'pin_belly');
+  $select->addField('f', 'tissue_damage');
+  $select->addField('f', 'comments');
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -543,7 +674,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id)
       '#rows' => $rows,
     );
 
-    $sum_chalimus = bamp_sum('chalimus', $rows);
+    $sum_chalimus = bamp_sum('total_chal', $rows);
 
     $ave_chalimus = $sum_chalimus / $page_limit;
 

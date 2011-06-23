@@ -126,8 +126,10 @@ function bamp_sum($field, $rows) {
   return $sum;
 }
 
-function r_implode( $glue1, $glue2, $pieces )
+function r_implode( $glue1, $glue2, $pieces=NULL )
 {
+  $retVal = array();
+  
 	foreach( $pieces as $r_pieces )
 	{
     		if( is_array( $r_pieces ) )
@@ -139,5 +141,41 @@ function r_implode( $glue1, $glue2, $pieces )
       			$retVal[] = (int)$r_pieces;
     		}
   	}
-  	return implode( $glue1, $retVal );
+    
+    if($retVal == NULL) {
+      return NULL;
+    } else {
+     return implode( $glue1, $retVal ); 
+    }
 } 
+
+function d_implode( $glue, $pieces ) 
+{ 
+  foreach( $pieces as $r_pieces ) 
+  { 
+    if( is_array( $r_pieces ) ) 
+    { 
+      $retVal[] = d_implode( $glue, $r_pieces ); 
+    } 
+    else 
+    { 
+      $retVal[] = $r_pieces; 
+    } 
+  } 
+  return implode( $glue, $retVal ); 
+} 
+
+/**
+ * Function to export MySQL data as CSV
+ * @param type $result
+ * @param type $filename 
+ */
+
+function export_to_csv($data,  $filename = 'myfile.csv'){ 
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+  
+  print($data) . "\r\n";
+ 
+  exit; 
+}

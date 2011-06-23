@@ -202,23 +202,39 @@ if ($species == "") {
     $value = (int)$value;
   }
   
-  var_dump($entriese);
+  $no_entries = count($entriese);
+  $chart_width = $no_entries * 50;
+  if($chart_width >= 700) {
+    $chart_width = 700;
+  }
+  
+  drupal_set_message(t($no_entries . ' results returned'));
+  drupal_set_message($entriesi);
   
   $bar = new bar();
   $bar->set_values($entriese);
   $bar->colour('#1C9E05');
 
+  $x = new x_axis();
+  $x->set_steps( 20 );
+  
+  $y = new y_axis();
+  $y->set_range( 0, 20, 1 );
+  
   $chart = new open_flash_chart();
-  $chart->set_title($title);
+//  $chart->set_title($title);
   $chart->add_element($bar);
 
+  $chart->set_x_axis( $x );
+  $chart->set_y_axis( $y );
+  
   $data = $chart->toPrettyString();
   
 //  JS to render the chart and display it in a div
   drupal_add_js('sites/default/modules/bamp/charts/js/json/json2.js');
   drupal_add_js('sites/default/modules/bamp/charts/js/swfobject.js');
   $chart_data = '<script type="text/javascript">
-  swfobject.embedSWF("sites/default/modules/bamp/charts/open-flash-chart.swf", "div_chart", "600", "600", "9.0.0", "expressInstall.swf", {"get-data":"get_data_1"}, {"wmode" : "transparent"} );
+  swfobject.embedSWF("sites/default/modules/bamp/charts/open-flash-chart.swf", "div_chart", "' . $chart_width . '", "500", "9.0.0", "expressInstall.swf", {"get-data":"get_data_1"}, {"wmode" : "transparent"} );
  
   function ofc_ready() {}
  
@@ -242,10 +258,33 @@ if ($species == "") {
     '#title' => t('Details'),
   );
 //  Display search parameters
-  $species_message = '<p>Species: ' . $species . '</br>';
-  $trip_message = 'Trip: ' . $trip . '</br>';
-  $site_message = 'Site: ' . $site . '</br>';
-  $date_message = 'Date: ' . $date . '</br></p>';
+  if ($species == NULL) {
+    $species_message = 'Species: All<br />';
+  }
+  else {
+    $species_message = 'Species: ' . $species . '<br />';
+  }
+  
+  if ($trip == NULL) {
+    $trip_message = 'Trip: All<br />';
+  }
+  else {
+    $trip_message = 'Trip: ' . $trip . '<br />';
+  }
+  
+  if ($site == NULL) {
+    $site_message = 'Site: All<br />';
+  }
+  else {
+    $site_message = 'Site: ' . $site . '<br />';
+  }
+  
+ if ($date == NULL) {
+    $date_message = 'Date: All<br />';
+  }
+  else {
+    $date_message = 'Date: ' . $date . '<br />';
+  }
 
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $date_message,
