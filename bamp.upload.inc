@@ -13,8 +13,12 @@ function bampupload_form($form_state) {
 
   $form = array();
 
-  $content['form'] = array(
-    '#markup' => '<p> This is the BAMP upload menu</p>',
+  $form['form'] = array(
+    '#markup' => '<A href="?q=bamp/Upload%20forms/Crawford%20Site%20CSV%20upload">Crawford Site CSV upload</A></br>
+      <A href="?q=bamp/Upload%20forms/Crawford%20field%20results%20CSV%20upload">Crawford field results CSV upload</A></br>
+      <A href="?q=bamp/Upload%20forms/Crawford%20lab%20results%20CSV%20upload">Crawford lab results CSV upload</A></br>
+      <A href="?q=bamp/Upload%20forms/Marty%20field%20results%20CSV%20upload">Marty field results CSV upload</A></br>
+      <A href="?q=bamp/Upload%20forms/Marty%20site%20results%20CSV%20upload">Marty site results CSV upload</A></br>',
   );
 
   return $form;
@@ -22,201 +26,6 @@ function bampupload_form($form_state) {
 
 function bampupload_menu_callback() {
   return drupal_get_form('bampupload_form');
-}
-
-/**
- * Create BAMP CSV upload form
- */
-function bampupcsv_form($form_state) {
-  drupal_set_title(t('CSV upload form'));
-
-  $form = array();
-
-  $form['#attributes'] = array('enctype' => "multipart/form-data");
-
-  $form['form'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('CSV upload'),
-  );
-
-  $form['form']['csv'] = array(
-    '#type' => 'file',
-    '#title' => t('Select a CSV file'),
-    '#size' => 40,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-    '#executes_submit_callback' => TRUE,
-  );
-
-  return $form;
-}
-
-function bampupcsv_menu_callback() {
-  return drupal_get_form('bampupcsv_form');
-}
-
-function bampupcsv_form_validate($form, &$form_state) {
-
-  $validators = array('file_validate_extensions' => array('csv'));
-  $file = file_save_upload('csv', $validators);
-
-  if (!$file)
-    form_set_error('upload', 'You must select a valid file to upload.');
-  else {
-    // Manually add the uploaded file to the $form_state
-    $form_state['values']['csv']['title'] = $file->filename;
-    $form_state['values']['csv']['file'] = $file;
-    $form_state['values']['csv']['filepath'] = $file->destination;
-  }
-}
-
-function bampupcsv_form_submit($form, &$form_state) {
-
-  $csv_file_path = $form_state['values']['csv']['filepath'];
-  $csv_file_name = $form_state['values']['csv']['title'];
-
-  $aa = csv2aa($csv_file_path, ',');
-  
-  // Variables common to all the sample batches in the file
-  $site = $aa[0][3];
-  $tfish = $aa[0][10];
-  $method = $aa[9][2];
-
-
-  drupal_set_message(t('Site: ' . $site));
-  drupal_set_message(t('Number of fish: ' . $tfish));
-  drupal_set_message(t('Method: ' . $method));
-
-
-  $mid = db_query("SELECT id FROM {bamp_method} WHERE name = :method", array(':method' => $method))->fetchField();
-
-  if (empty($mid)) {
-    drupal_set_message(t('Invalid method in CSV'));
-  }
-
-  $sid = db_query("SELECT id FROM {bamp_sites} WHERE name = :site", array(':site' => $site))->fetchField();
-
-  if (empty($sid)) {
-    drupal_set_message(t('Invalid site in CSV'));
-  }
-
-  drupal_set_message(t('Site ID: ' . $sid));
-
-  for ($i = 0; $i <= 2; $i++) {
-
-    // Variables that may vary between sample batches
-
-    if ($i == 0) {
-      $ddiff = 0;
-      $udiff = 0;
-      $pdiff = 0;
-    }
-    elseif ($i == 1) {
-      $ddiff = 47;
-      $udiff = 46;
-      $pdiff = 47;
-    }
-    else {
-      $ddiff = 100;
-      $udiff = 99;
-      $pdiff = 100;
-    }
-
-    $date = $aa[7 + $ddiff][1];
-    $user = $aa[7 + $udiff][5];
-    $pen = $aa[8 + $pdiff][1];
-
-    $mdate = ($date * 86400);
-
-    $rdate = date('d-M-y H:m:s', $timestamp = $mdate);
-
-    drupal_set_message(t('Date: ' . $rdate));
-    drupal_set_message(t('User: ' . $user));
-    drupal_set_message(t('Pen: ' . $pen));
-
-    for ($j = 0; $j <= 19; $j++) {
-
-      // Variables that very within a sample batch
-
-      $rid = next_id('bamp_results');
-      $nid = $rid;
-      $fid = $aa[11 + $pdiff + $j][0];
-      $size = $aa[11 + $pdiff + $j][1];
-      if ($size == '') {
-        $size = '0';
-      }
-      $chal = $aa[11 + $pdiff + $j][2];
-      if ($chal == '') {
-        $chal = '0';
-      }
-      $pre = $aa[11 + $pdiff + $j][3];
-      if ($pre == '') {
-        $pre = '0';
-      }
-      $male = $aa[11 + $pdiff + $j][4];
-      if ($male == '') {
-        $male = '0';
-      }
-      $female = $aa[11 + $pdiff + $j][5];
-      if ($female == '') {
-        $female = '0';
-      }
-      $grav = $aa[11 + $pdiff + $j][6];
-      if ($grav == '') {
-        $grav = '0';
-      }
-      $cal = $aa[11 + $pdiff + $j][7];
-      if ($cal == '') {
-        $cal = '0';
-      }
-      $comm = $aa[11 + $pdiff + $j][10];
-
-      drupal_set_message(t('Result ID: ' . $rid));
-      drupal_set_message(t('Fish ID: ' . $fid));
-      drupal_set_message(t('Size: ' . $size));
-      drupal_set_message(t('Chalimus: ' . $chal));
-      drupal_set_message(t('Pre-adult: ' . $pre));
-      drupal_set_message(t('Male: ' . $male));
-      drupal_set_message(t('Female: ' . $female));
-      drupal_set_message(t('Gravid: ' . $grav));
-      drupal_set_message(t('Caligus: ' . $cal));
-      drupal_set_message(t('Comments: ' . $comm));
-
-      $sample = db_insert('bamp_results')
-          ->fields(array(
-            'id' => $rid,
-            'fish_id' => $fid,
-            'caligus' => $cal,
-            'chalimus' => $chal,
-            'female' => $female,
-            'gravid' => $grav,
-            'lab_id' => '0',
-            'male' => $male,
-            'method' => $mid,
-            'user' => $user,
-            'pre_adult' => $pre,
-            'scarring' => '0',
-            'comments' => $comm,
-            'date' => $mdate,
-            'site_id' => $sid,
-            'pen' => $pen,
-            'tot_fish' => $tfish,
-            'size' => $size,
-          ))
-          ->execute();
-
-      dummy_node($form, $form_state, $nid);
-    }
-  }
-
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
-
-//  } catch (Exception $e) {
-//    drupal_set_message(t('Invalid values were found in the CSV file'), 'error', FALSE);
-//  }
 }
 
 /**
@@ -276,15 +85,19 @@ function bampupcrawfield_form_submit($form, &$form_state) {
   $aa = csv2aa($csv_file_path, ',');
 
   $na = (count($aa) - 1);
+  
+  $nu = '50';
 
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
+  drupal_set_message(t($nu . ' of these entries were uploaded'));
 
-  for ($j = 1; $j <= $na; $j++) {
+  for ($j = 1; $j <= $nu; $j++) {
 
     $rid = next_id('bamp_field_results');
-    
-    
+
+
     $fid = $aa[$j][0];
+    $group = 'crawford';
     $trip_id = $aa[$j][1];
     $species = $aa[$j][2];
     $date = $aa[$j][3];
@@ -292,9 +105,9 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $blind_no = $aa[$j][5];
     $lab_id = $aa[$j][6];
     $site = $aa[$j][7];
-    
+
     $site_name = trim(str_replace("  ", " ", $site));
-    
+
     $samp_id = $aa[$j][8];
     $crew = $aa[$j][9];
     $scar_chal = $aa[$j][10];
@@ -319,9 +132,14 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $comm = $aa[$j][25];
     $total_motile = $total_cal_pre + $total_cal_adult + $total_lep_pre + $total_lep_adult;
 
+    if ($species == 'Xcoho') {
+      $species = 'Coho';
+    }
+    
     $sample = db_insert('bamp_field_results')
         ->fields(array(
           'id' => $rid,
+          'group_name' => $group,
           'fish_id' => $fid,
           'sample_id' => $samp_id,
           'trip_id' => $trip_id,
@@ -355,7 +173,6 @@ function bampupcrawfield_form_submit($form, &$form_state) {
           'total_motile' => $total_motile,
         ))
         ->execute();
-
   }
 
   drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
@@ -426,6 +243,7 @@ function bampupcrawsite_form_submit($form, &$form_state) {
   for ($j = 1; $j <= $na; $j++) {
 
     $sid = next_id('bamp_sites');
+    $group = 'crawford';
     $name = $aa[$j][0];
     $craw_site_id = $aa[$j][1];
     $lat = $aa[$j][2];
@@ -436,10 +254,9 @@ function bampupcrawsite_form_submit($form, &$form_state) {
     $sample = db_insert('bamp_sites')
         ->fields(array(
           'id' => $sid,
+          'group_name' => $group,
           'craw_site_id' => $craw_site_id,
           'name' => $name,
-          'max_latitude' => NULL,
-          'max_longitude' => NULL,
           'min_latitude' => $lat,
           'min_longitude' => $lon,
           'type' => '0',
@@ -516,10 +333,11 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
   $na = (count($aa) - 1);
 
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  
+
   for ($j = 1; $j <= $na; $j++) {
 
     $lrid = next_id('bamp_lab_results');
+    $group = 'crawford';
     $fid = $aa[$j][0];
     $trip_id = $aa[$j][1];
     $group_id = $aa[$j][2];
@@ -531,7 +349,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $weight = $aa[$j][9];
     $total_lice = $aa[$j][30];
     $comm = $aa[$j][32];
-    
+
     if ($lspecies == '') {
       $lspecies = 'Same';
     }
@@ -552,6 +370,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $sample = db_insert('bamp_lab_results')
         ->fields(array(
           'id' => $lrid,
+          'group_name' => $group,
           'fish_id' => $fid,
           'trip_id' => $trip_id,
           'group_id' => $group_id,
@@ -567,7 +386,6 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
-  
 }
 
 /**
@@ -628,17 +446,20 @@ function bampupmartyfield_form_submit($form, &$form_state) {
 
   $na = (count($aa) - 1);
 
+  $nu = '50';
+  
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
+  drupal_set_message(t($nu . ' of these entries were uploaded'));
 
-  for ($j = 1; $j <= $na; $j++) {
+  for ($j = 1; $j <= $nu; $j++) {
 
     $rid = next_id('bamp_field_results');
-    
+    $group = 'marty';
     $date = $aa[$j][0];
     $rep = $aa[$j][1];
     $route = $aa[$j][2];
     $site_num = $aa[$j][3];
-    $species = $aa[$j][4];
+    $species_num = $aa[$j][4];
     $length = $aa[$j][5];
     $height = $aa[$j][6];
     $lep_cop = $aa[$j][7];
@@ -671,19 +492,50 @@ function bampupmartyfield_form_submit($form, &$form_state) {
     $comm = $aa[$j][28];
     $total_motile = $total_lep + $total_cal;
     $total_lice = $total_cop + $total_chal + $total_cal + $total_lep;
+    $route_let = substr($route, 0, 1);
 
+    $fin = db_select('bamp_field_results', 'x')
+        ->fields('x', array('sample_no'))
+        ->condition('date', $date, '=')
+        ->condition('rep_no', $rep, '=')
+        ->condition('route', $route, '=')
+        ->condition('site_no', $site_num, '=')
+        ->orderBy('sample_no', 'DESC')
+        ->execute()
+        ->fetchAssoc();
+    
+    $fish_no = $fin['sample_no'];
+    $fish_no++;
+    $fid = 'K' . $date . '-' . $rep . '-' . $route_let . $site_num . '-' . $fish_no;
+    
+    $site_name = db_select('bamp_sites', 's')
+        ->fields('s', array('name'))
+        ->condition('year', $date, '=')
+        ->condition('rep', $rep, '=')
+        ->condition('route', $route, '=')
+        ->condition('craw_site_id', $site_num, '=')
+        ->execute()
+        ->fetchAssoc();
+    
+    if ($species_num == '1') {
+      $species = 'Pink';
+    } elseif ($species_num == '2') {
+      $species = 'Chum';
+    } else {
+      $species = NULL;
+    }
     
     $sample = db_insert('bamp_field_results')
         ->fields(array(
           'id' => $rid,
-//          'fish_id' => $fid,
-         
-        
+          'group_name' => $group,
+          'fish_id' => $fid,
           'species' => $species,
-         
+          'site_name' => $site_name,
           'site_no' => $site_num,
           'route' => $route,
           'rep_no' => $rep,
+          'sample_no' => $fish_no,
           'length' => $length,
           'height' => $height,
           'comments' => $comm,
@@ -719,7 +571,118 @@ function bampupmartyfield_form_submit($form, &$form_state) {
           'total_motile' => $total_motile,
         ))
         ->execute();
+  }
 
+  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+}
+
+function bampupmartysite_form($form_state) {
+  drupal_set_title(t('Marty site CSV upload form'));
+
+  $form = array();
+
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field CSV upload'),
+  );
+
+  $form['form']['csv'] = array(
+    '#type' => 'file',
+    '#title' => t('Select a CSV file'),
+    '#size' => 40,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#executes_submit_callback' => TRUE,
+  );
+
+  return $form;
+}
+
+function bampupmartysite_menu_callback() {
+  return drupal_get_form('bampupmartysite_form');
+}
+
+function bampupmartysite_form_validate($form, &$form_state) {
+
+  $validators = array('file_validate_extensions' => array('csv'));
+  $file = file_save_upload('csv', $validators);
+
+  if (!$file)
+    form_set_error('upload', 'You must select a valid file to upload.');
+  else {
+    // Manually add the uploaded file to the $form_state
+    $form_state['values']['csv']['title'] = $file->filename;
+    $form_state['values']['csv']['file'] = $file;
+    $form_state['values']['csv']['filepath'] = $file->destination;
+  }
+}
+
+function bampupmartysite_form_submit($form, &$form_state) {
+
+  $csv_file_path = $form_state['values']['csv']['filepath'];
+  $csv_file_name = $form_state['values']['csv']['title'];
+
+  $aa = csv2aa($csv_file_path, ',');
+
+  $na = (count($aa) - 1);
+
+  drupal_set_message(t('There are ' . $na . ' entries in this file'));
+
+  for ($j = 1; $j <= $na; $j++) {
+
+    $group = 'marty';
+    $sid = next_id('bamp_sites');
+
+    $year = $aa[$j][0];
+    $date = $aa[$j][1];
+    $rep = $aa[$j][2];
+    $route = $aa[$j][3];
+    $site_name = $aa[$j][4];
+    $site_no = $aa[$j][5];
+    $distance = $aa[$j][6];
+    $lat = $aa[$j][7];
+    $lon = $aa[$j][8];
+    $temp = $aa[$j][9];
+    $sal = $aa[$j][10];
+
+    if (!is_numeric($lat)) {
+      $lat = 0;
+    }
+    
+    if (! is_numeric($lon)) {
+      $lon = 0;
+    }
+    
+    if (! is_numeric($temp)) {
+      $temp = NULL;
+    }
+    
+    if (!is_numeric($sal)) {
+      $sal = NULL;
+    }
+    
+    $sample = db_insert('bamp_sites')
+        ->fields(array(
+          'id' => $sid,      
+          'year' => $year,
+          'date' => $date,
+          'rep' => $rep,
+          'route' => $route,
+          'name' => $site_name,
+          'craw_site_id' => $site_no,
+          'distance' => $distance,
+          'min_latitude' => $lat,
+          'min_longitude' => $lon,
+          'temp' => $temp,
+          'sal' => $sal,
+          'group_name' => $group,
+        ))
+        ->execute();
   }
 
   drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));

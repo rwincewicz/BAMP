@@ -130,5 +130,5 @@ function bamp_search_results_form_submit($form, &$form_state) {
     $no_results = $form_state['values']['list_no']; 
   }
   
-  drupal_goto('bamp/Report forms/Results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results);
+  drupal_goto('bamp/Report forms/Field results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results);
 }

@@ -152,7 +152,7 @@ function bamp_charts1_menu_callback() {
 }
 
 function bamp_charts2_form($form, &$form_state, $species, $trip, $site, $date) {
-  drupal_set_title(t('Chart 2'));
+  drupal_set_title(t('Total lice per fish'));
 
 $select = db_select('bamp_field_results', 'f');
 //$select->range(0,10);
@@ -209,7 +209,7 @@ if ($species == "") {
   }
   
   drupal_set_message(t($no_entries . ' results returned'));
-  drupal_set_message($entriesi);
+//  drupal_set_message($entriesi);
   
   $bar = new bar();
   $bar->set_values($entriese);
@@ -221,12 +221,16 @@ if ($species == "") {
   $y = new y_axis();
   $y->set_range( 0, 20, 1 );
   
+  $y_legend = new y_legend( 'Total lice' );
+  $y_legend->set_style( '{font-size: 18px; color: #778877}' );
+  
   $chart = new open_flash_chart();
 //  $chart->set_title($title);
   $chart->add_element($bar);
 
   $chart->set_x_axis( $x );
   $chart->set_y_axis( $y );
+  $chart->set_y_legend( $y_legend );
   
   $data = $chart->toPrettyString();
   

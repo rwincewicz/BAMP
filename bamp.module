@@ -85,12 +85,6 @@ function bamp_menu() {
     'access callback' => TRUE,
   );
 
-  $items['bamp/Upload forms/CSV upload'] = array(
-    'title' => 'CSV upload',
-    'page callback' => 'bampupcsv_menu_callback',
-    'access callback' => TRUE,
-  );
-
   $items['bamp/Upload forms/Crawford field results CSV upload'] = array(
     'title' => 'Crawford field results CSV upload',
     'page callback' => 'bampupcrawfield_menu_callback',
@@ -112,6 +106,12 @@ function bamp_menu() {
   $items['bamp/Upload forms/Marty field results CSV upload'] = array(
     'title' => 'Marty field results CSV upload',
     'page callback' => 'bampupmartyfield_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Upload forms/Marty site results CSV upload'] = array(
+    'title' => 'Marty site results CSV upload',
+    'page callback' => 'bampupmartysite_menu_callback',
     'access callback' => TRUE,
   );
 
