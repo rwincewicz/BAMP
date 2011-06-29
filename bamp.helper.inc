@@ -6,7 +6,7 @@
  * @return type 
  */
 
-function next_id($table) {
+function next_id_bamp($table) {
 
 //  Queries the $table in the drupal database and 
 //  returns the next number for the id field
@@ -178,4 +178,42 @@ function export_to_csv($data,  $filename = 'myfile.csv'){
   print($data) . "\r\n";
  
   exit; 
+}
+
+/**
+ * Function to sort the returned data into a suitable form for CSV download
+ * @param type $header
+ * @param type $rows
+ * @return string 
+ */
+function prep_for_csv($header, $rows){
+  
+  $no = count($header);
+  
+//  The first two headers are arrays because they can be sorted
+//  This code just pulls out the relevant data
+  $result = $header[0]['data'];
+  $result .= ',';
+  $result .= $header[1]['data'];
+  
+//  Loop through the remaining headers
+  for ($i = 2; $i < $no; $i++) {
+    
+  $result .= ',';
+  $result .= $header[$i];
+  
+  }
+  
+//  Add a line break at the end
+  $result .= "\r\n";
+  
+  $nr = count($rows);
+  
+//  Loop through the data in the rows putting commas and line breaks where required
+  for ($i = 0; $i < $nr; $i++) {
+    $result .= implode(',', $rows[$i]);
+    $result .= "\r\n";
+  }
+  
+  return $result;
 }

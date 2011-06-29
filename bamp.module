@@ -12,6 +12,7 @@ include 'bamp.output.inc';
 include 'bamp.search.inc';
 include 'bamp.chart.inc';
 include 'bamp.map.inc';
+include 'bamp.edit.inc';
 
 function bamp_views_api() {
   return array(
@@ -148,6 +149,18 @@ function bamp_menu() {
   $items['bamp/Report forms/Sites'] = array(
     'title' => 'Sites report',
     'page callback' => 'bamprepsite_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Edit forms'] = array(
+    'title' => 'Edit Forms',
+    'page callback' => 'bampedit_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Edit forms/Individual Field results'] = array(
+    'title' => 'Field edit form',
+    'page callback' => 'bampeditfield_menu_callback',
     'access callback' => TRUE,
   );
   

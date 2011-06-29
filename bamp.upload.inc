@@ -82,19 +82,20 @@ function bampupcrawfield_form_submit($form, &$form_state) {
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = csv2aa($csv_file_path, ';');
 
   $na = (count($aa) - 1);
   
-  $nu = '50';
+//  $nu = '100';
+  
+  $nu = $na;
 
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
   drupal_set_message(t($nu . ' of these entries were uploaded'));
 
   for ($j = 1; $j <= $nu; $j++) {
 
-    $rid = next_id('bamp_field_results');
-
+    $rid = next_id_bamp('bamp_field_results');
 
     $fid = $aa[$j][0];
     $group = 'crawford';
@@ -242,7 +243,7 @@ function bampupcrawsite_form_submit($form, &$form_state) {
   drupal_set_message(t('There are ' . $na . ' sites in this file'));
   for ($j = 1; $j <= $na; $j++) {
 
-    $sid = next_id('bamp_sites');
+    $sid = next_id_bamp('bamp_sites');
     $group = 'crawford';
     $name = $aa[$j][0];
     $craw_site_id = $aa[$j][1];
@@ -336,7 +337,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
 
   for ($j = 1; $j <= $na; $j++) {
 
-    $lrid = next_id('bamp_lab_results');
+    $lrid = next_id_bamp('bamp_lab_results');
     $group = 'crawford';
     $fid = $aa[$j][0];
     $trip_id = $aa[$j][1];
@@ -446,14 +447,16 @@ function bampupmartyfield_form_submit($form, &$form_state) {
 
   $na = (count($aa) - 1);
 
-  $nu = '50';
+//  $nu = '100';
+  
+  $nu = $na;
   
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
   drupal_set_message(t($nu . ' of these entries were uploaded'));
 
   for ($j = 1; $j <= $nu; $j++) {
 
-    $rid = next_id('bamp_field_results');
+    $rid = next_id_bamp('bamp_field_results');
     $group = 'marty';
     $date = $aa[$j][0];
     $rep = $aa[$j][1];
@@ -636,7 +639,7 @@ function bampupmartysite_form_submit($form, &$form_state) {
   for ($j = 1; $j <= $na; $j++) {
 
     $group = 'marty';
-    $sid = next_id('bamp_sites');
+    $sid = next_id_bamp('bamp_sites');
 
     $year = $aa[$j][0];
     $date = $aa[$j][1];

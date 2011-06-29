@@ -198,6 +198,8 @@ if ($species == "") {
 //  Code to set up the variables for the chart
   $title = new title(t('BAMP chart'));
   
+//  PHP pulls the data from the DB out as strings no matter what the data type is in the DB
+//  This just casts the string as an integer so that it works in the JS graphing applet 
   foreach($entriese as &$value) {
     $value = (int)$value;
   }

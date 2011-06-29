@@ -19,23 +19,19 @@ function bampreport_menu_callback() {
   return drupal_get_form('bampreport_form');
 }
 
+/**
+ * Create form for displaying Farm data
+ * @param type $form
+ * @param type $form_state
+ * @return string 
+ */
+
+
+// Not sure whether this is staying as farm and wild data may be merged into 'field' data
 function bamprepfarm_form($form, &$form_state) {
   drupal_set_title(t('Farm report form'));
 
   $form = array();
-
-  $form['changethis'] = array(
-    '#type' => 'select',
-    '#options' => array(
-      'one' => 'one',
-      'two' => 'two',
-      'three' => 'three',
-    ),
-    '#ajax' => array(
-      'callback' => 'ajax_example_simplest_callback',
-      'wrapper' => 'replace_textfield_div',
-    ),
-  );
 
   $form['form'] = array(
     '#type' => 'fieldset',
@@ -55,51 +51,30 @@ function bamprepfarm_form($form, &$form_state) {
     '#options' => db_list('bamp_results', 'date'),
   );
 
-  $form['form']['pen'] = array(
-    '#type' => 'select',
-    '#title' => 'Pen',
-    '#options' => db_list('bamp_results', 'pen'),
-    '#ajax' => array(
-      'callback' => 'ajax_example_simplest_callback',
-      'wrapper' => 'replace_textfield_div',
-    )
-  );
-
-
-  // This entire form element will be replaced with an updated value.
-  $form['replace_textfield'] = array(
-    '#type' => 'textfield',
-    '#title' => t("The default value will be changed"),
-    '#description' => t("Say something about why you chose") . "'" .
-    (!empty($form_state['values']['form']['pen']) ? $form_state['values']['form']['pen'] : t("Not changed yet")) . "'",
-    '#prefix' => '<div id="replace_textfield_div">',
-    '#suffix' => '</div>',
-  );
-
   return $form;
-}
-
-function ajax_example_simplest_callback($form, $form_state) {
-  // The form has already been submitted and updated. We can return the replaced
-  // item as it is.
-  return $form['replace_textfield'];
-}
-
-function table_show($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
-}
-
-function build_table($form, $form_state) {
-  return $form['table'];
 }
 
 function bamprepfarm_menu_callback() {
   return drupal_get_form('bamprepfarm_form');
 }
 
+/**
+ * Form to display combined results of field and lab data where overlap exists
+ * @param type $form
+ * @param type $form_state
+ * @param string $species_id
+ * @param string $trip_id
+ * @param string $site_id
+ * @param type $no_results
+ * @return string 
+ */
+
 function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
   drupal_set_title(t('Combined results report form'));
 
+  // Values can be passed in the URL to narrow the search
+  // If the value isn't passed then all the results are returned
+  
   if ($species_id == NULL) {
     $species_message = 'Species: All<br />';
   }
@@ -149,6 +124,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
 
   $form = array();
 
+// Build array for the headers. id and fish_id can be sorted
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -160,9 +136,8 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     t('Species'),
     t('Weight/kg'),
     t('Length/mm'),
-    t('Caligus - Lab'),
-    t('Chalimus - Field'),
-    t('Total lice'),
+    t('Total lice - Field'),
+    t('Total lice - Lab'),
     t('Species - Lab'));
 
   $form['form'] = array(
@@ -170,19 +145,23 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     '#title' => t('Search details'),
   );
 
+//  Add a message into the fieldset indicating the number of results returned
   if ($no_results == 'all') {
-    $list_no = next_id('bamp_field_results');
+    $list_no = next_id_bamp('bamp_field_results');
     $no_message = 'Showing all results</br>';
   } else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
   }
   
+//  Start the DB query specifying a sort of the table output and using the pager functionality. 
+//  Limit the number of results per page to $list_no
   $select = db_select('bamp_field_results', 'f')
       ->extend('TableSort')
       ->extend("PagerDefault")
       ->limit($list_no);
 
+//  Translate "" to NULL for each of the entries so that consistent results are returned
   if ($species_id == "") {
     $species_id = NULL;
   }
@@ -195,6 +174,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     $site_id = NULL;
   }
 
+//  If the value passed isn't NULL then add the value as a condition in the DB query
   if ($species_id !== NULL) {
     $select->condition('f.species', $species_id, '=');
   }
@@ -207,15 +187,18 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     $select->condition('f.site_name', $site_id, '=');
   }
 
+//  Put a message in the fieldset indicating which values for each field are being queried
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
   
+//  Create a 'download CSV' button to allow the results of the query to be exported
   $form['form']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Download CSV')
     );
   
+//  Add the relevant fields into the query and execute it
   $select->leftJoin('bamp_lab_results', 'l', 'f.fish_id = l.fish_id');
   $select->addField('f', 'id');
   $select->addField('f', 'fish_id');
@@ -227,13 +210,13 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
   $select->addField('f', 'species');
   $select->addField('l', 'weight');
   $select->addField('l', 'length');
-  $select->addField('l', 'caligus');
-  $select->addField('f', 'chalimus');
   $select->addField('f', 'total_lice');
+  $select->addField('l', 'total_lice');
   $select->addField('l', 'species');
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
+//  Create an array for the results and populate it from the DB query
   $rows = array();
 
   foreach ($entries as $result) {
@@ -241,6 +224,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     $rows[] = array_map('check_plain', $result);
   }
 
+//  If no results are returned then indicate this, otherwise create the results table
   if ($rows == NULL) {
     $form['form']['none'] = array(
       '#markup' => '<p><h1>No results found</h1></p>',
@@ -253,6 +237,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
       '#rows' => $rows,
     );
 
+//    Perform sum and average calculations on relevant columns
     if ($no_results == 'all') {
       $no_results = count($rows);
     }
@@ -265,46 +250,50 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
 
     $ave_length = round($sum_length / $no_results, 2);
 
-    $sum_chalimus = bamp_sum('chalimus', $rows);
+//    $sum_chalimus = bamp_sum('chalimus', $rows);
+//
+//    $ave_chalimus = round($sum_chalimus / $no_results, 2);
+//
+//    $sum_caligus = bamp_sum('caligus', $rows);
 
-    $ave_chalimus = round($sum_chalimus / $no_results, 2);
-
-    $sum_caligus = bamp_sum('caligus', $rows);
-
-    $ave_caligus = round($sum_caligus / $no_results, 2);
+//    $ave_caligus = round($sum_caligus / $no_results, 2);
 
     $sum_total_lice = bamp_sum('total_lice', $rows);
 
     $ave_total_lice = round($sum_total_lice / $no_results, 2);
 
+//    Create the rows for the second table containing the calculations
     $sum = array(
       array('sum' => 'Total',
         'weight' => $sum_weight,
         'length' => $sum_length,
-        'caligus' => $sum_caligus,
-        'chalimus' => $sum_chalimus,
+//        'caligus' => $sum_caligus,
+//        'chalimus' => $sum_chalimus,
         'total_lice' => $sum_total_lice),
       array('sum' => 'Average',
         'weight' => $ave_weight,
         'length' => $ave_length,
-        'caligus' => $ave_caligus,
-        'chalimus' => $ave_chalimus,
+//        'caligus' => $ave_caligus,
+//        'chalimus' => $ave_chalimus,
         'total_lice' => $ave_total_lice));
 
+//    Create the table header
     $header_calc = array(
       t(''),
       t('Weight/kg'),
       t('Length/mm'),
-      t('Caligus - Lab'),
-      t('Chalimus - Field'),
+//      t('Caligus - Lab'),
+//      t('Chalimus - Field'),
       t('Total lice'));
 
+//    Create the table
     $form['sum'] = array(
       '#theme' => 'table',
       '#header' => $header_calc,
       '#rows' => $sum,
     );
 
+//    Add in the pager at the bottom
     $form['pager'] = array(
       '#theme' => 'pager',
       '#quantity' => 10,
@@ -312,25 +301,13 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     
   }
   
-  $no = count($header);
+$result = prep_for_csv($header, $rows);
   
-  $result = $header[0]['data'];
-  $result .= ',';
-  $result .= $header[1]['data'];
-  
-  for ($i = 2; $i < $no; $i++) {
-    
-  $result .= ',';
-  $result .= $header[$i];
-  
-  }
-  
+//  Pass the data as a hidden variable in the form_state array
   $form['data'] = array(
     '#type' => 'hidden',
     '#value' => $result,
   );
-  
-  var_dump($result);
   
   return $form;
 }
@@ -339,6 +316,11 @@ function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL
   return drupal_get_form('bamprepres_form', $species_id, $trip_id, $site_id, $no_results);
 }
 
+/**
+ * Submit function to download a CSV file of the selected results 
+ * @param type $form
+ * @param type $form_state 
+ */
 function bamprepres_form_submit($form, &$form_state) {
   
 $result = $form_state['values']['data'];
@@ -348,10 +330,9 @@ $filename = 'data.csv';
 drupal_add_http_header('Content-Type', 'text/csv');
 drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
   
-//  print($result) . "\r\n";
+print($result) . "\r\n";
  
-  exit; 
-//export_to_csv($data);
+  exit;
 
 }
 /**
@@ -390,6 +371,7 @@ function bamprepsite_form($form, &$form_state) {
 
   $page_limit = 20;
 
+//  Create header array with the first two fields being sortable
   $header = array(
     array('data' => t('Site ID'), 'field' => 'id'),
     array('data' => t('Site ID'), 'field' => 'craw_site_id'),
@@ -407,6 +389,7 @@ function bamprepsite_form($form, &$form_state) {
     t('Temp'),
     t('Salinity'));
 
+//  Select table and specify fields to return for DB query
   $select = db_select('bamp_sites', 's')
       ->extend('TableSort')
       ->extend("PagerDefault")
@@ -429,24 +412,33 @@ function bamprepsite_form($form, &$form_state) {
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
+//  Loop through results and add them to an array
   foreach ($entries as $result) {
 
     $rows[] = array_map('check_plain', $result);
   }
 
+//  Create table
   $form['Form'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
   );
 
-//  var_dump($rows);
-
+//  Add pager to the end of the table
   $form['pager'] = array(
     '#theme' => 'pager',
     '#quantity' => 10,
   );
 
+  $result = prep_for_csv($header, $rows);
+  
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
@@ -454,9 +446,20 @@ function bamprepsite_menu_callback() {
   return drupal_get_form('bamprepsite_form');
 }
 
+/**
+ * Report form for field (farm + wild) results
+ * @param type $form
+ * @param type $form_state
+ * @param string $species_id
+ * @param string $trip_id
+ * @param string $site_id
+ * @param type $no_results
+ * @return string 
+ */
 function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
   drupal_set_title(t('Field results report form'));
 
+//  Identify is an argument is present or not and if so create a message for the search details
   if ($species_id == NULL) {
     $species_message = 'Species: All<br />';
   }
@@ -508,6 +511,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 
   $page_limit = 20;
 
+//  Create header array with the first two fields being sortable
   $header = array(
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
@@ -566,24 +570,28 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     t('Tissue damage'),
     t('Comments'));
 
+//  Fieldset to hold the HTML details about the search
   $form['form'] = array(
     '#type' => 'fieldset',
     '#title' => t('Search details'),
   );
   
+//  Check if the search returns any results and display a relevant message
   if ($no_results == 'all') {
-    $list_no = next_id('bamp_field_results');
+    $list_no = next_id_bamp('bamp_field_results');
     $no_message = 'Showing all results</br>';
   } else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
   }
 
+//  Select table to query, specify table output and use the pager
   $select = db_select('bamp_field_results', 'f')
       ->extend('TableSort')
       ->extend("PagerDefault")
       ->limit($list_no);
 
+//  Clear up input so that "" is set to NULL
   if ($species_id == "") {
     $species_id = NULL;
   }
@@ -596,6 +604,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     $site_id = NULL;
   }
 
+//  If the values aren't NULL then narrow the search based on the value
   if ($species_id !== NULL) {
     $select->condition('f.species', $species_id, '=');
   }
@@ -608,6 +617,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     $select->condition('f.site_name', $site_id, '=');
   }
 
+//  Specify fields to return from the query and execute the query
   $select->addField('f', 'id');
   $select->addField('f', 'fish_id');
   $select->addField('f', 'trip_id');
@@ -669,15 +679,32 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 
   $rows = array();
 
+//  Add the results from the query into an array
   foreach ($entries as $result) {
 
     $rows[] = array_map('check_plain', $result);
   }
+
+  $nr = count($rows);
+
+//  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Field results/' . $id);
+  }
   
+//  Add the message identifying what criteria were used to create the results
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
   
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Download CSV')
+    );
+  
+//  If the query doesn't return any results then notify the user, otherwise create the table
   if ($rows == NULL) {
     $form['form']['none'] = array(
       '#markup' => '<p><h1>No results found</h1></p>',
@@ -733,12 +760,45 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
       '#quantity' => 10,
     );
   }
-
+  
+  $result = prep_for_csv($header, $rows);
+  
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
 function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20) {
   return drupal_get_form('bamprepfield_form', $species_id, $trip_id, $site_id, $no_results);
+}
+
+/**
+ * Create the report form for the lab result data
+ * @param type $form
+ * @param type $form_state
+ * @param string $species_id
+ * @param string $trip_id
+ * @param string $lab
+ * @return int 
+ */
+
+function bamprepfield_form_submit($form, &$form_state) {
+  
+$result = $form_state['values']['data'];
+
+$filename = 'data.csv';
+
+drupal_add_http_header('Content-Type', 'text/csv');
+drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+  
+print($result) . "\r\n";
+ 
+  exit;
+
 }
 
 function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {

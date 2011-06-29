@@ -32,7 +32,7 @@ function bampsample_form($form_state) {
   );
 
   $form['form']['sid'] = array(
-    '#markup' => '<p><h4><b> Sample id: ' . next_id('bamp_samples') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Sample id: ' . next_id_bamp('bamp_samples') . '</b></h4></p>',
   );
 
   $names = db_select('users', 'u')
@@ -148,7 +148,7 @@ function bampfarm_form($form_state) {
   );
 
   $form['form']['fid'] = array(
-    '#markup' => '<p><h4><b> Farm id: ' . next_id('bamp_farm') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Farm id: ' . next_id_bamp('bamp_farm') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -191,7 +191,7 @@ function bampfarm_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_farm')
       ->fields(array(
-        'id' => next_id('bamp_farm'),
+        'id' => next_id_bamp('bamp_farm'),
         'name' => $form_state['values']['name'],
         'description' => $form_state['values']['description'],
         'treatments' => $form_state['values']['treatments'],
@@ -213,7 +213,7 @@ function bampsite_form($form_state) {
   );
 
   $form['form']['siid'] = array(
-    '#markup' => '<p><h4><b> Site id: ' . next_id('bamp_sites') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Site id: ' . next_id_bamp('bamp_sites') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -282,7 +282,7 @@ function bampsite_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_sites')
       ->fields(array(
-        'id' => next_id('bamp_sites'),
+        'id' => next_id_bamp('bamp_sites'),
         'name' => $form_state['values']['name'],
         'type' => $form_state['values']['type'],
         'min_longitude' => $form_state['values']['min_lon'],
@@ -309,7 +309,7 @@ function bampmethod_form($form_state) {
   );
 
   $form['form']['mid'] = array(
-    '#markup' => '<p><h4><b> Method id: ' . next_id('bamp_method') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Method id: ' . next_id_bamp('bamp_method') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -342,7 +342,7 @@ function bampmethod_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_method')
       ->fields(array(
-        'id' => next_id('bamp_method'),
+        'id' => next_id_bamp('bamp_method'),
         'name' => $form_state['values']['name'],
         'description' => $form_state['values']['description'],
       ))
@@ -363,7 +363,7 @@ function bamptrip_form($form_state) {
   );
 
   $form['form']['tid'] = array(
-    '#markup' => '<p><h4><b> Trip id: ' . next_id('bamp_trip') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Trip id: ' . next_id_bamp('bamp_trip') . '</b></h4></p>',
   );
 
   $form['form']['sid'] = array(
@@ -415,7 +415,7 @@ function bamplab_form($form_state) {
   );
 
   $form['form']['lid'] = array(
-    '#markup' => '<p><h4><b> Lab id: ' . next_id('bamp_lab') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Lab id: ' . next_id_bamp('bamp_lab') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -456,7 +456,7 @@ function bampres_form($form_state) {
   );
 
   $form['form']['rid'] = array(
-    '#markup' => '<p><h4><b> Result id: ' . next_id('bamp_results') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Result id: ' . next_id_bamp('bamp_results') . '</b></h4></p>',
   );
 
   $form['form']['sid'] = array(
