@@ -1,5 +1,13 @@
 <?php
 
+// $Id: bamp.search.inc $
+
+/**
+ * @file
+ * Code to create bamp search forms
+ */
+
+
 /**
  *  Create top-level search menu page
  */
@@ -126,7 +134,8 @@ function bamp_search_results_form_submit($form, &$form_state) {
   
   if ($all_results == TRUE) {
     $no_results = 'all';
-  } else {
+  } 
+  else {
     $no_results = $form_state['values']['list_no']; 
   }
   

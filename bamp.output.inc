@@ -1,5 +1,12 @@
 <?php
 
+// $Id: bamp.output.inc $
+
+/**
+ * @file
+ * Code to create bamp output forms
+ */
+
 /**
  * Create BAMP report menu
  */
@@ -17,45 +24,6 @@ function bampreport_form($form_state) {
 
 function bampreport_menu_callback() {
   return drupal_get_form('bampreport_form');
-}
-
-/**
- * Create form for displaying Farm data
- * @param type $form
- * @param type $form_state
- * @return string 
- */
-
-
-// Not sure whether this is staying as farm and wild data may be merged into 'field' data
-function bamprepfarm_form($form, &$form_state) {
-  drupal_set_title(t('Farm report form'));
-
-  $form = array();
-
-  $form['form'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Details'),
-    '#tree' => TRUE,
-  );
-
-  $form['form']['sid'] = array(
-    '#type' => 'select',
-    '#title' => 'Site ID',
-    '#options' => db_list('bamp_sites', 'name'),
-  );
-
-  $form['form']['date'] = array(
-    '#type' => 'select',
-    '#title' => 'Date',
-    '#options' => db_list('bamp_results', 'date'),
-  );
-
-  return $form;
-}
-
-function bamprepfarm_menu_callback() {
-  return drupal_get_form('bamprepfarm_form');
 }
 
 /**
@@ -149,7 +117,8 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
   if ($no_results == 'all') {
     $list_no = next_id_bamp('bamp_field_results');
     $no_message = 'Showing all results</br>';
-  } else {
+  } 
+  else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
   }
@@ -378,6 +347,8 @@ function bamprepsite_form($form, &$form_state) {
     t('Name'),
     t('Latitude'),
     t('Longitude'),
+    t('Type'),
+    t('Description'),
     t('Farm ID'),
     t('Zone'),
     t('Area'),
@@ -385,9 +356,7 @@ function bamprepsite_form($form, &$form_state) {
     t('Year'),
     t('Repetition'),
     t('Route'),
-    t('Distance'),
-    t('Temp'),
-    t('Salinity'));
+    t('Distance'));
 
 //  Select table and specify fields to return for DB query
   $select = db_select('bamp_sites', 's')
@@ -399,6 +368,8 @@ function bamprepsite_form($form, &$form_state) {
   $select->addField('s', 'name');
   $select->addField('s', 'min_latitude');
   $select->addField('s', 'min_longitude');
+  $select->addField('s', 'type');
+  $select->addField('s', 'description');
   $select->addField('s', 'farm_id');
   $select->addField('s', 'zone');
   $select->addField('s', 'area');
@@ -407,8 +378,6 @@ function bamprepsite_form($form, &$form_state) {
   $select->addField('s', 'rep');
   $select->addField('s', 'route');
   $select->addField('s', 'distance');
-  $select->addField('s', 'temp');
-  $select->addField('s', 'sal');
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -580,7 +549,8 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
   if ($no_results == 'all') {
     $list_no = next_id_bamp('bamp_field_results');
     $no_message = 'Showing all results</br>';
-  } else {
+  } 
+  else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
   }
@@ -681,7 +651,6 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 
 //  Add the results from the query into an array
   foreach ($entries as $result) {
-
     $rows[] = array_map('check_plain', $result);
   }
 
@@ -729,9 +698,9 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 ////
 ////    $ave_caligus = $sum_caligus / $page_limit;
 //
-//    $sum_total_lice = bamp_sum('total_lice', $no_results);
-//
-//    $ave_total_lice = $sum_total_lice / $no_results;
+    $sum_total_lice = bamp_sum('total_lice', $no_results);
+
+    $ave_total_lice = $sum_total_lice / $no_results;
 //
 //    $sum = array(
 //      array('sum' => 'Total',
@@ -860,15 +829,44 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     array('data' => t('Fish ID'), 'field' => 'fish_id'),
     t('Trip ID'),
     t('Lab'),
+    t('Lab ID'),
     t('Date'),
     t('Group ID'),
+    t('Method'),
+    t('People'),
     t('Species'),
     t('Weight/kg'),
     t('Length/mm'),
-    t('Caligus'),
-    t('Chalimus'),
+    t('Lep_C0'),
+    t('Lep_C1'),
+    t('Lep_C2'),
+    t('Lep_C3'),
+    t('Lep_C4M'),
+    t('Lep_C4F'),
+    t('Lep_PAM'),
+    t('Lep_PAF'),
+    t('Lep_AM'),
+    t('Lep_AF'),
+    t('Lep_NM_Notid'),
+    t('Lep_Mot_Notid'),
+    t('Total Lep'),
+    t('Cal_C0'),
+    t('Cal_C1'),
+    t('Cal_C2'),
+    t('Cal_C3'),
+    t('Cal_C4M'),
+    t('Cal_C4F'),
+    t('Cal_PAM'),
+    t('Cal_PAF'),
+    t('Cal_AM'),
+    t('Cal_AF'),
+    t('Cal_NM_Notid'),
+    t('Cal_Mot_Notid'),
+    t('Total Caligus'),
     t('Total lice'),
-    t('Species'));
+    t('Condition factor'),
+    t('Scarring'),
+    t('Comments'),);
 
   $form['form'] = array(
     '#type' => 'fieldset',
@@ -912,15 +910,44 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   $select->addField('l', 'fish_id');
   $select->addField('l', 'trip_id');
   $select->addField('l', 'lab');
+  $select->addField('l', 'lab_id');
   $select->addField('l', 'date');
   $select->addField('l', 'group_id');
+  $select->addField('l', 'method');
+  $select->addField('l', 'people');
   $select->addField('l', 'species');
   $select->addField('l', 'weight');
   $select->addField('l', 'length');
-  $select->addField('l', 'caligus');
-  $select->addField('l', 'chalimus');
+  $select->addField('l', 'lep_c0');
+  $select->addField('l', 'lep_c1');
+  $select->addField('l', 'lep_c2');
+  $select->addField('l', 'lep_c3');
+  $select->addField('l', 'lep_c4m');
+  $select->addField('l', 'lep_c4f');
+  $select->addField('l', 'lep_pam');
+  $select->addField('l', 'lep_paf');
+  $select->addField('l', 'lep_am');
+  $select->addField('l', 'lep_af');
+  $select->addField('l', 'lep_nm_notid');
+  $select->addField('l', 'lep_mot_notid');
+  $select->addField('l', 'total_lep');
+  $select->addField('l', 'cal_c0');
+  $select->addField('l', 'cal_c1');
+  $select->addField('l', 'cal_c2');
+  $select->addField('l', 'cal_c3');
+  $select->addField('l', 'cal_c4m');
+  $select->addField('l', 'cal_c4f');
+  $select->addField('l', 'cal_pam');
+  $select->addField('l', 'cal_paf');
+  $select->addField('l', 'cal_am');
+  $select->addField('l', 'cal_af');
+  $select->addField('l', 'cal_nm_notid');
+  $select->addField('l', 'cal_mot_notid');
+  $select->addField('l', 'total_caligus');
   $select->addField('l', 'total_lice');
-  $select->addField('l', 'species');
+  $select->addField('l', 'condition_factor');
+  $select->addField('l', 'scarring');
+  $select->addField('l', 'comments');  
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -951,13 +978,13 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
 
     $ave_length = round($sum_length / $page_limit, 2);
     
-    $sum_chalimus = bamp_sum('chalimus', $rows);
-
-    $ave_chalimus = $sum_chalimus / $page_limit;
-
-    $sum_caligus = bamp_sum('caligus', $rows);
+    $sum_caligus = bamp_sum('total_caligus', $rows);
 
     $ave_caligus = $sum_caligus / $page_limit;
+
+    $sum_lep = bamp_sum('total_lep', $rows);
+
+    $ave_lep = $sum_lep / $page_limit;
 
     $sum_total_lice = bamp_sum('total_lice', $rows);
 
@@ -968,13 +995,13 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
         'weight' => $sum_weight,
         'length' => $sum_length,
         'caligus' => $sum_caligus,
-        'chalimus' => $sum_chalimus,
+        'lep' => $sum_lep,
         'total_lice' => $sum_total_lice),
       array('sum' => 'Average',
         'weight' => $ave_weight,
         'length' => $ave_length,
         'caligus' => $ave_caligus,
-        'chalimus' => $ave_chalimus,
+        'lap' => $ave_lep,
         'total_lice' => $ave_total_lice));
 
     $header_calc = array(
@@ -982,7 +1009,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
       t('Weight/kg'),
       t('Length/mm'),
       t('Caligus'),
-      t('Chalimus'),
+      t('Lep'),
       t('Total lice'));
 
     $form['sum'] = array(
@@ -1002,4 +1029,36 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
 
 function bampreplab_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
   return drupal_get_form('bampreplab_form', $species_id, $trip_id, $site_id);
+}
+
+function bamprepenv_form($form_state) {
+  drupal_set_title(t('Environmental data'));
+
+  $form = array();
+
+  $content['form'] = array(
+    '#markup' => '<p> This is the BAMP environmental form</p>',
+  );
+
+  return $form;
+}
+
+function bamprepenv_menu_callback() {
+  return drupal_get_form('bamprepenv_form');
+}
+
+function bamprepweather_form($form_state) {
+  drupal_set_title(t('Weather data'));
+
+  $form = array();
+
+  $content['form'] = array(
+    '#markup' => '<p> This is the BAMP weather form</p>',
+  );
+
+  return $form;
+}
+
+function bamprepweather_menu_callback() {
+  return drupal_get_form('bamprepweather_form');
 }

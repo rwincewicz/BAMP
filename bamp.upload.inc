@@ -1,5 +1,12 @@
 <?php
 
+// $Id: bamp.upload.inc $
+
+/**
+ * @file
+ * Code to create bamp upload forms
+ */
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -95,8 +102,6 @@ function bampupcrawfield_form_submit($form, &$form_state) {
 
   for ($j = 1; $j <= $nu; $j++) {
 
-    $rid = next_id_bamp('bamp_field_results');
-
     $fid = $aa[$j][0];
     $group = 'crawford';
     $trip_id = $aa[$j][1];
@@ -137,9 +142,11 @@ function bampupcrawfield_form_submit($form, &$form_state) {
       $species = 'Coho';
     }
     
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+    
     $sample = db_insert('bamp_field_results')
         ->fields(array(
-          'id' => $rid,
           'group_name' => $group,
           'fish_id' => $fid,
           'sample_id' => $samp_id,
@@ -172,6 +179,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
           'total_cal_adult' => $total_cal_adult,
           'total_cal' => $total_cal,
           'total_motile' => $total_motile,
+          'upload_user' => $username,
         ))
         ->execute();
   }
@@ -243,7 +251,6 @@ function bampupcrawsite_form_submit($form, &$form_state) {
   drupal_set_message(t('There are ' . $na . ' sites in this file'));
   for ($j = 1; $j <= $na; $j++) {
 
-    $sid = next_id_bamp('bamp_sites');
     $group = 'crawford';
     $name = $aa[$j][0];
     $craw_site_id = $aa[$j][1];
@@ -254,7 +261,6 @@ function bampupcrawsite_form_submit($form, &$form_state) {
 
     $sample = db_insert('bamp_sites')
         ->fields(array(
-          'id' => $sid,
           'group_name' => $group,
           'craw_site_id' => $craw_site_id,
           'name' => $name,
@@ -337,7 +343,6 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
 
   for ($j = 1; $j <= $na; $j++) {
 
-    $lrid = next_id_bamp('bamp_lab_results');
     $group = 'crawford';
     $fid = $aa[$j][0];
     $trip_id = $aa[$j][1];
@@ -355,22 +360,8 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
       $lspecies = 'Same';
     }
 
-    drupal_set_message(t('Lab Result ID: ' . $lrid));
-    drupal_set_message(t('Fish ID: ' . $fid));
-    drupal_set_message(t('Trip ID: ' . $trip_id));
-    drupal_set_message(t('Group ID: ' . $group_id));
-    drupal_set_message(t('Lab: ' . $lab));
-    drupal_set_message(t('Date: ' . $date));
-    drupal_set_message(t('Fish number: ' . $fish_no));
-    drupal_set_message(t('Lab Species: ' . $lspecies));
-    drupal_set_message(t('Length: ' . $length));
-    drupal_set_message(t('Weight: ' . $weight));
-    drupal_set_message(t('Total lice: ' . $total_lice));
-    drupal_set_message(t('Comments: ' . $comm));
-
     $sample = db_insert('bamp_lab_results')
         ->fields(array(
-          'id' => $lrid,
           'group_name' => $group,
           'fish_id' => $fid,
           'trip_id' => $trip_id,
@@ -456,7 +447,6 @@ function bampupmartyfield_form_submit($form, &$form_state) {
 
   for ($j = 1; $j <= $nu; $j++) {
 
-    $rid = next_id_bamp('bamp_field_results');
     $group = 'marty';
     $date = $aa[$j][0];
     $rep = $aa[$j][1];
@@ -522,15 +512,19 @@ function bampupmartyfield_form_submit($form, &$form_state) {
     
     if ($species_num == '1') {
       $species = 'Pink';
-    } elseif ($species_num == '2') {
+    } 
+    elseif ($species_num == '2') {
       $species = 'Chum';
-    } else {
+    } 
+    else {
       $species = NULL;
     }
     
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+    
     $sample = db_insert('bamp_field_results')
         ->fields(array(
-          'id' => $rid,
           'group_name' => $group,
           'fish_id' => $fid,
           'species' => $species,
@@ -572,6 +566,7 @@ function bampupmartyfield_form_submit($form, &$form_state) {
           'pin_belly' => $pin_belly,
           'tissue_damage' => $tissue_damage,
           'total_motile' => $total_motile,
+          'upload_user' => $username,
         ))
         ->execute();
   }
@@ -639,8 +634,6 @@ function bampupmartysite_form_submit($form, &$form_state) {
   for ($j = 1; $j <= $na; $j++) {
 
     $group = 'marty';
-    $sid = next_id_bamp('bamp_sites');
-
     $year = $aa[$j][0];
     $date = $aa[$j][1];
     $rep = $aa[$j][2];
@@ -650,8 +643,9 @@ function bampupmartysite_form_submit($form, &$form_state) {
     $distance = $aa[$j][6];
     $lat = $aa[$j][7];
     $lon = $aa[$j][8];
-    $temp = $aa[$j][9];
-    $sal = $aa[$j][10];
+//    These need to go into the environmental table
+//    $temp = $aa[$j][9];
+//    $sal = $aa[$j][10];
 
     if (!is_numeric($lat)) {
       $lat = 0;
@@ -661,17 +655,16 @@ function bampupmartysite_form_submit($form, &$form_state) {
       $lon = 0;
     }
     
-    if (! is_numeric($temp)) {
-      $temp = NULL;
-    }
-    
-    if (!is_numeric($sal)) {
-      $sal = NULL;
-    }
+//    if (! is_numeric($temp)) {
+//      $temp = NULL;
+//    }
+//    
+//    if (!is_numeric($sal)) {
+//      $sal = NULL;
+//    }
     
     $sample = db_insert('bamp_sites')
-        ->fields(array(
-          'id' => $sid,      
+        ->fields(array(     
           'year' => $year,
           'date' => $date,
           'rep' => $rep,
@@ -681,8 +674,8 @@ function bampupmartysite_form_submit($form, &$form_state) {
           'distance' => $distance,
           'min_latitude' => $lat,
           'min_longitude' => $lon,
-          'temp' => $temp,
-          'sal' => $sal,
+//          'temp' => $temp,
+//          'sal' => $sal,
           'group_name' => $group,
         ))
         ->execute();

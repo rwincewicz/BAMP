@@ -1,5 +1,12 @@
 <?php
 
+// $Id: bamp.input.inc $
+
+/**
+ * @file
+ * Code to create bamp input forms
+ */
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -191,7 +198,6 @@ function bampfarm_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_farm')
       ->fields(array(
-        'id' => next_id_bamp('bamp_farm'),
         'name' => $form_state['values']['name'],
         'description' => $form_state['values']['description'],
         'treatments' => $form_state['values']['treatments'],
@@ -282,7 +288,6 @@ function bampsite_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_sites')
       ->fields(array(
-        'id' => next_id_bamp('bamp_sites'),
         'name' => $form_state['values']['name'],
         'type' => $form_state['values']['type'],
         'min_longitude' => $form_state['values']['min_lon'],
@@ -342,7 +347,6 @@ function bampmethod_form_submit($form, &$form_state) {
 
   $farm = db_insert('bamp_method')
       ->fields(array(
-        'id' => next_id_bamp('bamp_method'),
         'name' => $form_state['values']['name'],
         'description' => $form_state['values']['description'],
       ))

@@ -1,5 +1,12 @@
 <?php
 
+// $Id: bamp.chart.inc $
+
+/**
+ * @file
+ * Code to create bamp charts
+ */
+
 include 'charts/php-ofc-library/open-flash-chart.php';
 include 'bamp.helper.inc';
 
@@ -200,13 +207,13 @@ if ($species == "") {
   
 //  PHP pulls the data from the DB out as strings no matter what the data type is in the DB
 //  This just casts the string as an integer so that it works in the JS graphing applet 
-  foreach($entriese as &$value) {
+  foreach ($entriese as &$value) {
     $value = (int)$value;
   }
   
   $no_entries = count($entriese);
   $chart_width = $no_entries * 50;
-  if($chart_width >= 700) {
+  if ($chart_width >= 700) {
     $chart_width = 700;
   }
   

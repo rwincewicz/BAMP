@@ -1,5 +1,7 @@
 <?php
 
+// $Id: bamp.module $
+
 /**
  * @file
  * Creates the forms required for the bamp module.
@@ -13,6 +15,7 @@ include 'bamp.search.inc';
 include 'bamp.chart.inc';
 include 'bamp.map.inc';
 include 'bamp.edit.inc';
+include 'bamp.audit.inc';
 
 function bamp_views_api() {
   return array(
@@ -28,13 +31,15 @@ function bamp_menu() {
   $items['bamp'] = array(
     'title' => 'BAMP',
     'page callback' => 'bampmain_menu_callback',
-    "access callback" => TRUE,
+    'access callback' => TRUE,
+    'weight' => '0',
   );
 
   $items['bamp/Input forms'] = array(
     'title' => 'Input Forms',
     'page callback' => 'bampinput_menu_callback',
     'access callback' => TRUE,
+    'weight' => '1',
   );
 
   $items['bamp/Input forms/Sample'] = array(
@@ -84,6 +89,7 @@ function bamp_menu() {
     'title' => 'Upload Forms',
     'page callback' => 'bampupload_menu_callback',
     'access callback' => TRUE,
+    'weight' => '2',
   );
 
   $items['bamp/Upload forms/Crawford field results CSV upload'] = array(
@@ -120,12 +126,7 @@ function bamp_menu() {
     'title' => 'Report Forms',
     'page callback' => 'bampreport_menu_callback',
     'access callback' => TRUE,
-  );
-
-  $items['bamp/Report forms/Farm'] = array(
-    'title' => 'Farm report',
-    'page callback' => 'bamprepfarm_menu_callback',
-    'access callback' => TRUE,
+    'weight' => '4',
   );
   
   $items['bamp/Report forms/Results'] = array(
@@ -152,10 +153,23 @@ function bamp_menu() {
     'access callback' => TRUE,
   );
   
+  $items['bamp/Report forms/Environment'] = array(
+    'title' => 'Environmental report',
+    'page callback' => 'bamprepenv_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Report forms/Weather'] = array(
+    'title' => 'Weather report',
+    'page callback' => 'bamprepweather_menu_callback',
+    'access callback' => TRUE,
+  );
+  
   $items['bamp/Edit forms'] = array(
     'title' => 'Edit Forms',
     'page callback' => 'bampedit_menu_callback',
     'access callback' => TRUE,
+    'weight' => '5',
   );
   
   $items['bamp/Edit forms/Individual Field results'] = array(
@@ -168,6 +182,7 @@ function bamp_menu() {
     'title' => 'Search Forms',
     'page callback' => 'bamp_search_menu_callback',
     'access callback' => TRUE,
+    'weight' => '3',
   );
 
   $items['bamp/Search forms/Results'] = array(
@@ -180,6 +195,7 @@ function bamp_menu() {
     'title' => 'Charts',
     'page callback' => 'bamp_charts_menu_callback',
     'access callback' => TRUE,
+    'weight' => '6',
   );
 
   $items['bamp/Charts/Chart1'] = array(
@@ -198,11 +214,25 @@ function bamp_menu() {
     'title' => 'Maps',
     'page callback' => 'bamp_maps_menu_callback',
     'access callback' => TRUE,
+    'weight' => '7',
   );
 
   $items['bamp/Maps/Maps1'] = array(
     'title' => 'Maps1',
     'page callback' => 'bamp_maps1_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Audit'] = array(
+    'title' => 'Audit',
+    'page callback' => 'bamp_audit_menu_callback',
+    'access callback' => TRUE,
+    'weight' => '8',
+  );
+  
+  $items['bamp/Audit/Field results'] = array(
+    'title' => 'Field results',
+    'page callback' => 'bamp_audit_field_menu_callback',
     'access callback' => TRUE,
   );
   

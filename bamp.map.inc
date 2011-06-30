@@ -1,5 +1,12 @@
 <?php
 
+// $Id: bamp.map.inc $
+
+/**
+ * @file
+ * Code to create bamp map displays
+ */
+
 function bamp_maps_form($form_state) {
   drupal_set_title(t('Map menu'));
 

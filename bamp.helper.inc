@@ -1,11 +1,17 @@
 <?php
 
+// $Id: bamp.helper.inc $
+
+/**
+ * @file
+ * Helper functions for the BAMP module
+ */
+
 /**
  * Function that gives the next value from a field in the specified table
  * @param type $table
  * @return type 
  */
-
 function next_id_bamp($table) {
 
 //  Queries the $table in the drupal database and 
@@ -30,13 +36,12 @@ function next_id_bamp($table) {
  * @param type $delimiter
  * @return type 
  */
-
 function csv2aa($file, $delimiter) {
   if (($handle = fopen($file, "r")) !== FALSE) {
     $i = 0;
-    while (($lineArray = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
-      for ($j = 0; $j < count($lineArray); $j++) {
-        $arrarr[$i][$j] = $lineArray[$j];
+    while (($line_array = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
+      for ($j = 0; $j < count($line_array); $j++) {
+        $arrarr[$i][$j] = $line_array[$j];
       }
       $i++;
     }
@@ -52,7 +57,6 @@ function csv2aa($file, $delimiter) {
  * @param type $field
  * @return type 
  */
-
 function db_list($table, $field) {
 
   $list = db_select($table, 't')
@@ -77,7 +81,6 @@ function db_list($table, $field) {
  * @param type $form_state
  * @param type $nid 
  */
-
 function dummy_node($form, $form_state, $nid) {
   $node = new stdClass();
   $node->title = 'Dummy node';
@@ -95,7 +98,6 @@ function dummy_node($form, $form_state, $nid) {
  * @param type $nid
  * @return type 
  */
-
 function check_node($nid) {
   if (db_query("SELECT vid FROM {node} WHERE nid = :nid", array(':nid' => $nid))->fetchField()) {
     return TRUE;
@@ -111,7 +113,6 @@ function check_node($nid) {
  * @param type $rows
  * @return type 
  */
-
 function bamp_sum($field, $rows) {
 
   $sum = 0;
@@ -126,58 +127,50 @@ function bamp_sum($field, $rows) {
   return $sum;
 }
 
-function r_implode( $glue1, $glue2, $pieces=NULL )
-{
-  $retVal = array();
-  
-	foreach( $pieces as $r_pieces )
-	{
-    		if( is_array( $r_pieces ) )
-    		{
-      			$retVal[] = r_implode( $glue2, $glue2, $r_pieces );
-    		}
-    		else	
-    		{
-      			$retVal[] = (int)$r_pieces;
-    		}
-  	}
-    
-    if($retVal == NULL) {
-      return NULL;
-    } else {
-     return implode( $glue1, $retVal ); 
-    }
-} 
+function r_implode($glue1, $glue2, $pieces=NULL) {
+  $ret_val = array();
 
-function d_implode( $glue, $pieces ) 
-{ 
-  foreach( $pieces as $r_pieces ) 
-  { 
-    if( is_array( $r_pieces ) ) 
-    { 
-      $retVal[] = d_implode( $glue, $r_pieces ); 
-    } 
-    else 
-    { 
-      $retVal[] = $r_pieces; 
-    } 
-  } 
-  return implode( $glue, $retVal ); 
-} 
+  foreach ($pieces as $r_pieces) {
+    if (is_array($r_pieces)) {
+      $ret_val[] = r_implode($glue2, $glue2, $r_pieces);
+    }
+    else {
+      $ret_val[] = (int) $r_pieces;
+    }
+  }
+
+  if ($ret_val == NULL) {
+    return NULL;
+  }
+  else {
+    return implode($glue1, $ret_val);
+  }
+}
+
+function d_implode($glue, $pieces) {
+  foreach ($pieces as $r_pieces) {
+    if (is_array($r_pieces)) {
+      $ret_val[] = d_implode($glue, $r_pieces);
+    }
+    else {
+      $ret_val[] = $r_pieces;
+    }
+  }
+  return implode($glue, $ret_val);
+}
 
 /**
  * Function to export MySQL data as CSV
  * @param type $result
  * @param type $filename 
  */
-
-function export_to_csv($data,  $filename = 'myfile.csv'){ 
+function export_to_csv($data, $filename = 'myfile.csv') {
   drupal_add_http_header('Content-Type', 'text/csv');
   drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
-  
+
   print($data) . "\r\n";
- 
-  exit; 
+
+  exit;
 }
 
 /**
@@ -186,34 +179,42 @@ function export_to_csv($data,  $filename = 'myfile.csv'){
  * @param type $rows
  * @return string 
  */
-function prep_for_csv($header, $rows){
-  
+function prep_for_csv($header, $rows) {
+
   $no = count($header);
-  
+
 //  The first two headers are arrays because they can be sorted
 //  This code just pulls out the relevant data
   $result = $header[0]['data'];
   $result .= ',';
   $result .= $header[1]['data'];
-  
+
 //  Loop through the remaining headers
   for ($i = 2; $i < $no; $i++) {
-    
-  $result .= ',';
-  $result .= $header[$i];
-  
+
+    $result .= ',';
+    $result .= $header[$i];
   }
-  
+
 //  Add a line break at the end
   $result .= "\r\n";
-  
+
   $nr = count($rows);
-  
+
 //  Loop through the data in the rows putting commas and line breaks where required
   for ($i = 0; $i < $nr; $i++) {
     $result .= implode(',', $rows[$i]);
     $result .= "\r\n";
   }
-  
+
   return $result;
+}
+
+function user_name($userid) {
+  $query = db_select('users', 'u');
+  $query->condition('u.uid', $userid, '=');
+  $query->addField('u', 'name');
+  $name = $query->execute()->fetchAssoc();
+  $username = implode(',', $name);
+  return $username;
 }
