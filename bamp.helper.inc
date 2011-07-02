@@ -6,28 +6,31 @@
  * @file
  * Helper functions for the BAMP module
  */
-
 /**
  * Function that gives the next value from a field in the specified table
  * @param type $table
  * @return type 
  */
-function next_id_bamp($table) {
+if (!function_exists('next_id_bamp')) {
+
+  function next_id_bamp($table) {
 
 //  Queries the $table in the drupal database and 
 //  returns the next number for the id field
 
-  $xid = db_select($table, 'x')
-      ->fields('x', array('id'))
-      ->orderBy('id', 'DESC')
-      ->execute()
-      ->fetchAssoc();
+    $xid = db_select($table, 'x')
+        ->fields('x', array('id'))
+        ->orderBy('id', 'DESC')
+        ->execute()
+        ->fetchAssoc();
 
-  $nxid = $xid['id'];
+    $nxid = $xid['id'];
 
-  $nxid++;
+    $nxid++;
 
-  return $nxid;
+    return $nxid;
+  }
+
 }
 
 /**
@@ -36,18 +39,22 @@ function next_id_bamp($table) {
  * @param type $delimiter
  * @return type 
  */
-function csv2aa($file, $delimiter) {
-  if (($handle = fopen($file, "r")) !== FALSE) {
-    $i = 0;
-    while (($line_array = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
-      for ($j = 0; $j < count($line_array); $j++) {
-        $arrarr[$i][$j] = $line_array[$j];
+if (!function_exists('csv2aa')) {
+
+  function csv2aa($file, $delimiter) {
+    if (($handle = fopen($file, "r")) !== FALSE) {
+      $i = 0;
+      while (($line_array = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
+        for ($j = 0; $j < count($line_array); $j++) {
+          $arrarr[$i][$j] = $line_array[$j];
+        }
+        $i++;
       }
-      $i++;
+      fclose($handle);
     }
-    fclose($handle);
+    return $arrarr;
   }
-  return $arrarr;
+
 }
 
 /**
@@ -57,54 +64,25 @@ function csv2aa($file, $delimiter) {
  * @param type $field
  * @return type 
  */
-function db_list($table, $field) {
+if (!function_exists('db_list')) {
 
-  $list = db_select($table, 't')
-      ->fields('t', array('id', $field));
-  $result = $list->execute();
+  function db_list($table, $field) {
 
-  $lista = array();
+    $list = db_select($table, 't')
+        ->fields('t', array('id', $field));
+    $result = $list->execute();
 
-  while ($value = $result->fetchAssoc()) {
-    $lista[$value['id']] = $value[$field];
+    $lista = array();
+
+    while ($value = $result->fetchAssoc()) {
+      $lista[$value['id']] = $value[$field];
+    }
+
+    $listu = array_unique($lista);
+
+    return $listu;
   }
 
-  $listu = array_unique($lista);
-
-  return $listu;
-}
-
-/**
- * Function to create empty nodes to use Views to display content
- * Views expects nodes to be linked to content in the db
- * @param type $form
- * @param type $form_state
- * @param type $nid 
- */
-function dummy_node($form, $form_state, $nid) {
-  $node = new stdClass();
-  $node->title = 'Dummy node';
-  $node->type = 'article';
-  $node->status = 0;
-  $node->promote = 0;
-  $node->format = 0;
-  node_validate($node, $form, $form_state);
-  node_submit($node);
-  node_save($node);
-}
-
-/**
- * Function to check if a node exists or not
- * @param type $nid
- * @return type 
- */
-function check_node($nid) {
-  if (db_query("SELECT vid FROM {node} WHERE nid = :nid", array(':nid' => $nid))->fetchField()) {
-    return TRUE;
-  }
-  else {
-    return FALSE;
-  }
 }
 
 /**
@@ -113,50 +91,62 @@ function check_node($nid) {
  * @param type $rows
  * @return type 
  */
-function bamp_sum($field, $rows) {
+if (!function_exists('bamp_sum')) {
 
-  $sum = 0;
+  function bamp_sum($field, $rows) {
 
-  $list_no = count($rows);
+    $sum = 0;
 
-  for ($i = 0; $i < $list_no; $i++) {
+    $list_no = count($rows);
 
-    $sum += $rows[$i][$field];
+    for ($i = 0; $i < $list_no; $i++) {
+
+      $sum += $rows[$i][$field];
+    }
+
+    return $sum;
   }
 
-  return $sum;
 }
 
-function r_implode($glue1, $glue2, $pieces=NULL) {
-  $ret_val = array();
+if (!function_exists('r_implode')) {
 
-  foreach ($pieces as $r_pieces) {
-    if (is_array($r_pieces)) {
-      $ret_val[] = r_implode($glue2, $glue2, $r_pieces);
+  function r_implode($glue1, $glue2, $pieces=NULL) {
+    $ret_val = array();
+
+    foreach ($pieces as $r_pieces) {
+      if (is_array($r_pieces)) {
+        $ret_val[] = r_implode($glue2, $glue2, $r_pieces);
+      }
+      else {
+        $ret_val[] = (int) $r_pieces;
+      }
+    }
+
+    if ($ret_val == NULL) {
+      return NULL;
     }
     else {
-      $ret_val[] = (int) $r_pieces;
+      return implode($glue1, $ret_val);
     }
   }
 
-  if ($ret_val == NULL) {
-    return NULL;
-  }
-  else {
-    return implode($glue1, $ret_val);
-  }
 }
 
-function d_implode($glue, $pieces) {
-  foreach ($pieces as $r_pieces) {
-    if (is_array($r_pieces)) {
-      $ret_val[] = d_implode($glue, $r_pieces);
+if (!function_exists('d_implode')) {
+
+  function d_implode($glue, $pieces) {
+    foreach ($pieces as $r_pieces) {
+      if (is_array($r_pieces)) {
+        $ret_val[] = d_implode($glue, $r_pieces);
+      }
+      else {
+        $ret_val[] = $r_pieces;
+      }
     }
-    else {
-      $ret_val[] = $r_pieces;
-    }
+    return implode($glue, $ret_val);
   }
-  return implode($glue, $ret_val);
+
 }
 
 /**
@@ -164,13 +154,17 @@ function d_implode($glue, $pieces) {
  * @param type $result
  * @param type $filename 
  */
-function export_to_csv($data, $filename = 'myfile.csv') {
-  drupal_add_http_header('Content-Type', 'text/csv');
-  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+if (!function_exists('export_to_csv')) {
 
-  print($data) . "\r\n";
+  function export_to_csv($data, $filename = 'myfile.csv') {
+    drupal_add_http_header('Content-Type', 'text/csv');
+    drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
 
-  exit;
+    print($data) . "\r\n";
+
+    exit;
+  }
+
 }
 
 /**
@@ -179,42 +173,50 @@ function export_to_csv($data, $filename = 'myfile.csv') {
  * @param type $rows
  * @return string 
  */
-function prep_for_csv($header, $rows) {
+if (!function_exists('prep_for_csv')) {
 
-  $no = count($header);
+  function prep_for_csv($header, $rows) {
+
+    $no = count($header);
 
 //  The first two headers are arrays because they can be sorted
 //  This code just pulls out the relevant data
-  $result = $header[0]['data'];
-  $result .= ',';
-  $result .= $header[1]['data'];
+    $result = $header[0]['data'];
+    $result .= ',';
+    $result .= $header[1]['data'];
 
 //  Loop through the remaining headers
-  for ($i = 2; $i < $no; $i++) {
+    for ($i = 2; $i < $no; $i++) {
 
-    $result .= ',';
-    $result .= $header[$i];
-  }
+      $result .= ',';
+      $result .= $header[$i];
+    }
 
 //  Add a line break at the end
-  $result .= "\r\n";
+    $result .= "\r\n";
 
-  $nr = count($rows);
+    $nr = count($rows);
 
 //  Loop through the data in the rows putting commas and line breaks where required
-  for ($i = 0; $i < $nr; $i++) {
-    $result .= implode(',', $rows[$i]);
-    $result .= "\r\n";
+    for ($i = 0; $i < $nr; $i++) {
+      $result .= implode(',', $rows[$i]);
+      $result .= "\r\n";
+    }
+
+    return $result;
   }
 
-  return $result;
 }
 
-function user_name($userid) {
-  $query = db_select('users', 'u');
-  $query->condition('u.uid', $userid, '=');
-  $query->addField('u', 'name');
-  $name = $query->execute()->fetchAssoc();
-  $username = implode(',', $name);
-  return $username;
+if (!function_exists('user_name')) {
+
+  function user_name($userid) {
+    $query = db_select('users', 'u');
+    $query->condition('u.uid', $userid, '=');
+    $query->addField('u', 'name');
+    $name = $query->execute()->fetchAssoc();
+    $username = implode(',', $name);
+    return $username;
+  }
+
 }

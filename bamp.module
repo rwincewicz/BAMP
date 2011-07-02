@@ -122,6 +122,18 @@ function bamp_menu() {
     'access callback' => TRUE,
   );
 
+  $items['bamp/Upload forms/Weather CSV upload'] = array(
+    'title' => 'Weather CSV upload',
+    'page callback' => 'bampupweather_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Upload forms/Environment CSV upload'] = array(
+    'title' => 'Environment CSV upload',
+    'page callback' => 'bampupenvironment_menu_callback',
+    'access callback' => TRUE,
+  );
+  
   $items['bamp/Report forms'] = array(
     'title' => 'Report Forms',
     'page callback' => 'bampreport_menu_callback',
@@ -178,6 +190,18 @@ function bamp_menu() {
     'access callback' => TRUE,
   );
   
+  $items['bamp/Edit forms/Individual Site data'] = array(
+    'title' => 'Site edit form',
+    'page callback' => 'bampeditsite_menu_callback',
+    'access callback' => TRUE,
+  );
+  
+  $items['bamp/Edit forms/Weather data'] = array(
+    'title' => 'Weather edit form',
+    'page callback' => 'bampeditweather_menu_callback',
+    'access callback' => TRUE,
+  );
+  
   $items['bamp/Search forms'] = array(
     'title' => 'Search Forms',
     'page callback' => 'bamp_search_menu_callback',
@@ -230,9 +254,9 @@ function bamp_menu() {
     'weight' => '8',
   );
   
-  $items['bamp/Audit/Field results'] = array(
-    'title' => 'Field results',
-    'page callback' => 'bamp_audit_field_menu_callback',
+  $items['bamp/Audit/Results'] = array(
+    'title' => 'Audit results',
+    'page callback' => 'bamp_audit_results_menu_callback',
     'access callback' => TRUE,
   );
   

@@ -343,7 +343,7 @@ function bamprepsite_form($form, &$form_state) {
 //  Create header array with the first two fields being sortable
   $header = array(
     array('data' => t('Site ID'), 'field' => 'id'),
-    array('data' => t('Site ID'), 'field' => 'craw_site_id'),
+//    array('data' => t('Site ID-2'), 'field' => 'craw_site_id'),
     t('Name'),
     t('Latitude'),
     t('Longitude'),
@@ -364,7 +364,7 @@ function bamprepsite_form($form, &$form_state) {
       ->extend("PagerDefault")
       ->limit($page_limit);
   $select->addField('s', 'id');
-  $select->addField('s', 'craw_site_id');
+//  $select->addField('s', 'craw_site_id');
   $select->addField('s', 'name');
   $select->addField('s', 'min_latitude');
   $select->addField('s', 'min_longitude');
@@ -387,6 +387,14 @@ function bamprepsite_form($form, &$form_state) {
     $rows[] = array_map('check_plain', $result);
   }
 
+  $nr = count($rows);
+
+//  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Site data/' . $id);
+  }
+  
 //  Create table
   $form['Form'] = array(
     '#theme' => 'table',
@@ -866,7 +874,8 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     t('Total lice'),
     t('Condition factor'),
     t('Scarring'),
-    t('Comments'),);
+    t('Comments'),
+    );
 
   $form['form'] = array(
     '#type' => 'fieldset',
@@ -1056,6 +1065,97 @@ function bamprepweather_form($form_state) {
     '#markup' => '<p> This is the BAMP weather form</p>',
   );
 
+  // Check if there is sorting request
+  if (isset($_GET['sort']) && isset($_GET['order'])) {
+    // Sort it Ascending or Descending?
+    if ($_GET['sort'] == 'asc')
+      $sort = 'ASC';
+    else
+      $sort = 'DESC';
+
+    // Which column will be sorted
+    switch ($_GET['order']) {
+      case 'Result ID':
+        $order = 'id';
+        break;
+      case 'Date':
+        $order = 'fish_id';
+        break;
+      default:
+        $order = 'id';
+    }
+  }
+  else {
+    // Default sort
+    $sort = 'ASC';
+    $order = 'id';
+  }
+
+  $form = array();
+
+  $page_limit = 20;
+
+  $header = array(
+    array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Date'), 'field' => 'date'),
+    t('Time'),
+    t('Site ID'),
+    t('Temp'),
+    t('High temp'),
+    t('Low temp'),
+    t('Humidity'),
+    t('Dew point'),
+    t('Wind speed'),
+    t('High wind speed'),
+    t('Wind direction'),
+    t('Wind direction (deg)'),
+    t('Rain'),
+    t('Pressure'),
+    t('Arc int'),
+    );
+  
+   $select = db_select('bamp_weather', 'w')
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+   
+  $select->addField('w', 'id');
+  $select->addField('w', 'date');
+  $select->addField('w', 'time');
+  $select->addField('w', 'site_id');
+  $select->addField('w', 'temp');
+  $select->addField('w', 'temp_hi');
+  $select->addField('w', 'temp_low');
+  $select->addField('w', 'hum');
+  $select->addField('w', 'dew_pt');
+  $select->addField('w', 'wind_speed');
+  $select->addField('w', 'wind_hi');
+  $select->addField('w', 'wind_dir');
+  $select->addField('w', 'wind_dir_deg');
+  $select->addField('w', 'rain');
+  $select->addField('w', 'bar');
+  $select->addField('w', 'arc_int');
+  $select->orderBy($order, $sort);
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  $rows = array();
+
+  foreach ($entries as $result) {
+
+    $rows[] = array_map('check_plain', $result);
+  }
+  
+  $form['Form'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+    );
+  
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
+  
   return $form;
 }
 
