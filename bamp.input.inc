@@ -15,7 +15,7 @@
 /**
  * Create BAMP input menu
  */
-function bampinput_menu_callback() {
+function bamp_input_menu_callback() {
   drupal_set_title(t('BAMP Input Menu'));
 
   $content['form'] = array(
@@ -26,125 +26,9 @@ function bampinput_menu_callback() {
 }
 
 /**
- * Create BAMP sample input form
- */
-function bampsample_form($form_state) {
-  drupal_set_title(t('Sample input form'));
-
-  $form = array();
-
-  $form['form'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Sample details'),
-  );
-
-  $form['form']['sid'] = array(
-    '#markup' => '<p><h4><b> Sample id: ' . next_id_bamp('bamp_samples') . '</b></h4></p>',
-  );
-
-  $names = db_select('users', 'u')
-      ->fields('u', array('uid', 'name'))
-      ->condition('uid', 0, '!=');
-  $result = $names->execute();
-
-  $usersa = array();
-
-  while ($users = $result->fetchAssoc()) {
-    $usersa[$users['uid']] = $users['name'];
-  }
-
-  $form['form']['select'] = array(
-    '#type' => 'select',
-    '#title' => 'User',
-    '#options' => $usersa,
-  );
-
-  $form['form']['date'] = array(
-    '#type' => 'date',
-    '#title' => t('Date'),
-    '#required' => TRUE,
-  );
-
-  $form['form']['tripid'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Trip ID'),
-    '#required' => TRUE,
-  );
-
-  $form['form']['siteid'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Site ID'),
-    '#required' => TRUE,
-  );
-
-  $form['form']['species'] = array(
-    '#type' => 'select',
-    '#title' => t('Species'),
-    '#options' => array(
-      'atlantic' => t('Atlantic'),
-      'chinook' => t('Chinook'),
-    ),
-    '#required' => TRUE,
-  );
-
-  $form['form']['scarring'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Scarring'),
-    '#required' => TRUE,
-  );
-
-  $form['form']['length'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Length'),
-    '#required' => TRUE,
-  );
-
-  $form['form']['size'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Size'),
-    '#required' => TRUE,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-    '#executes_submit_callback' => TRUE,
-  );
-
-  return $form;
-}
-
-function bampsample_menu_callback() {
-  return drupal_get_form('bampsample_form');
-}
-
-function bampsample_form_submit($form, &$form_state) {
-  drupal_set_message(t('Form submitted successfully'));
-
-  $samples = db_select('bamp_samples', 's')
-      ->fields('s', array('id'))
-      ->orderBy('id', 'DESC')
-      ->execute()
-      ->fetchAssoc();
-
-  $nsample = $samples['id'];
-
-  $nsample++;
-
-  $sample = db_insert('bamp_samples')
-      ->fields(array(
-        'id' => $nsample,
-        'name' => $form_state['values']['name'],
-        'description' => $form_state['values']['description'],
-        'treatments' => $form_state['values']['treatments'],
-      ))
-      ->execute();
-}
-
-/**
  * Create BAMP farm input form
  */
-function bampfarm_form($form_state) {
+function bamp_farm_input_form($form_state) {
   drupal_set_title(t('Farm input form'));
 
   $form = array();
@@ -189,11 +73,11 @@ function bampfarm_form($form_state) {
   return $form;
 }
 
-function bampfarm_menu_callback() {
-  return drupal_get_form('bampfarm_form');
+function bamp_farm_input_menu_callback() {
+  return drupal_get_form('bamp_farm_input_form');
 }
 
-function bampfarm_form_submit($form, &$form_state) {
+function bamp_farm_input_form_submit($form, &$form_state) {
   drupal_set_message(t('Form submitted successfully'));
 
   $farm = db_insert('bamp_farm')
@@ -208,7 +92,7 @@ function bampfarm_form_submit($form, &$form_state) {
 /**
  * Create BAMP site input form
  */
-function bampsite_form($form_state) {
+function bamp_site_input_form($form_state) {
   drupal_set_title(t('Site input form'));
 
   $form = array();
@@ -279,11 +163,11 @@ function bampsite_form($form_state) {
   return $form;
 }
 
-function bampsite_menu_callback() {
-  return drupal_get_form('bampsite_form');
+function bamp_site_input_menu_callback() {
+  return drupal_get_form('bamp_site_input_form');
 }
 
-function bampsite_form_submit($form, &$form_state) {
+function bamp_site_input_form_submit($form, &$form_state) {
   drupal_set_message(t('Form submitted successfully'));
 
   $farm = db_insert('bamp_sites')
@@ -301,62 +185,9 @@ function bampsite_form_submit($form, &$form_state) {
 }
 
 /**
- * Create BAMP method input form
- */
-function bampmethod_form($form_state) {
-  drupal_set_title(t('Method input form'));
-
-  $form = array();
-
-  $form['form'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Method details'),
-  );
-
-  $form['form']['mid'] = array(
-    '#markup' => '<p><h4><b> Method id: ' . next_id_bamp('bamp_method') . '</b></h4></p>',
-  );
-
-  $form['form']['name'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Name',
-    '#required' => TRUE,
-  );
-
-  $form['form']['description'] = array(
-    '#type' => 'textarea',
-    '#title' => 'Description',
-    '#required' => TRUE,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-    '#executes_submit_callback' => TRUE,
-  );
-
-  return $form;
-}
-
-function bampmethod_menu_callback() {
-  return drupal_get_form('bampmethod_form');
-}
-
-function bampmethod_form_submit($form, &$form_state) {
-  drupal_set_message(t('Form submitted successfully'));
-
-  $farm = db_insert('bamp_method')
-      ->fields(array(
-        'name' => $form_state['values']['name'],
-        'description' => $form_state['values']['description'],
-      ))
-      ->execute();
-}
-
-/**
  * Create BAMP trip input form
  */
-function bamptrip_form($form_state) {
+function bamp_trip_input_form($form_state) {
   drupal_set_title(t('Trip input form'));
 
   $form = array();
@@ -401,14 +232,14 @@ function bamptrip_form($form_state) {
   return $form;
 }
 
-function bamptrip_menu_callback() {
-  return drupal_get_form('bamptrip_form');
+function bamp_trip_input_menu_callback() {
+  return drupal_get_form('bamp_trip_input_form');
 }
 
 /**
  * Create BAMP lab input form
  */
-function bamplab_form($form_state) {
+function bamp_lab_input_form($form_state) {
   drupal_set_title(t('Lab input form'));
 
   $form = array();
@@ -442,15 +273,15 @@ function bamplab_form($form_state) {
   return $form;
 }
 
-function bamplab_menu_callback() {
-  return drupal_get_form('bamplab_form');
+function bamp_lab_input_menu_callback() {
+  return drupal_get_form('bamp_lab_input_form');
 }
 
 /**
  * Create BAMP result input form
  */
-function bampres_form($form_state) {
-  drupal_set_title(t('Results input form'));
+function bamp_field_input_form($form_state) {
+  drupal_set_title(t('Field results input form'));
 
   $form = array();
 
@@ -460,7 +291,7 @@ function bampres_form($form_state) {
   );
 
   $form['form']['rid'] = array(
-    '#markup' => '<p><h4><b> Result id: ' . next_id_bamp('bamp_results') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Result id: ' . next_id_bamp('bamp_field_results') . '</b></h4></p>',
   );
 
   $form['form']['sid'] = array(
@@ -578,6 +409,6 @@ function bampres_form($form_state) {
   return $form;
 }
 
-function bampres_menu_callback() {
-  return drupal_get_form('bampres_form');
+function bamp_field_input_menu_callback() {
+  return drupal_get_form('bamp_field_input_form');
 }

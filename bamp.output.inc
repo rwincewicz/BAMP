@@ -433,7 +433,7 @@ function bamprepsite_menu_callback() {
  * @param type $no_results
  * @return string 
  */
-function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
+function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results, $data) {
   drupal_set_title(t('Field results report form'));
 
 //  Identify is an argument is present or not and if so create a message for the search details
@@ -509,6 +509,29 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     t('Species'),
     t('Height/mm'),
     t('Length/mm'),
+    t('Weight'));
+  
+  if ($data == 'y') {
+    $header = array(
+       array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Fish ID'), 'field' => 'fish_id'),
+    t('Trip ID'),
+    t('Sample ID'),
+    t('Site name'),
+    t('Site number'),
+    t('Set number'),
+    t('Blind number'),
+    t('To Lab'),
+    t('Date'),
+    t('Pen'),
+    t('Input name'),
+    t('Route'),
+    t('Repetition number'),
+    t('Number of fish sampled'),
+    t('Crew'),
+    t('Species'),
+    t('Height/mm'),
+    t('Length/mm'),
     t('Weight'),
     t('Lep copepods'),
     t('Cal copepods'),
@@ -546,6 +569,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     t('Pinched belly'),
     t('Tissue damage'),
     t('Comments'));
+  }
 
 //  Fieldset to hold the HTML details about the search
   $form['form'] = array(
@@ -616,6 +640,8 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
   $select->addField('f', 'height');
   $select->addField('f', 'length');
   $select->addField('f', 'weight');
+  
+  if ($data == 'y') {
   $select->addField('f', 'cop_lep');
   $select->addField('f', 'cop_cal');
   $select->addField('f', 'total_cop');
@@ -652,6 +678,8 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
   $select->addField('f', 'pin_belly');
   $select->addField('f', 'tissue_damage');
   $select->addField('f', 'comments');
+  }
+  
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -706,10 +734,10 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 ////
 ////    $ave_caligus = $sum_caligus / $page_limit;
 //
-    $sum_total_lice = bamp_sum('total_lice', $no_results);
-
-    $ave_total_lice = $sum_total_lice / $no_results;
+//    $sum_total_lice = bamp_sum('total_lice', $no_results);
 //
+//    $ave_total_lice = $sum_total_lice / $no_results;
+////
 //    $sum = array(
 //      array('sum' => 'Total',
 ////        'caligus' => $sum_caligus,
@@ -749,8 +777,8 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
   return $form;
 }
 
-function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20) {
-  return drupal_get_form('bamprepfield_form', $species_id, $trip_id, $site_id, $no_results);
+function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20, $data='y') {
+  return drupal_get_form('bamprepfield_form', $species_id, $trip_id, $site_id, $no_results, $data);
 }
 
 /**
@@ -967,6 +995,14 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     $rows[] = array_map('check_plain', $result);
   }
 
+  $nr = count($rows);
+
+//  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Lab results/' . $id);
+  }
+  
   if ($rows == NULL) {
     $form['form']['none'] = array(
       '#markup' => '<p><h1>No results found</h1></p>',
@@ -1049,6 +1085,87 @@ function bamprepenv_form($form_state) {
     '#markup' => '<p> This is the BAMP environmental form</p>',
   );
 
+  // Check if there is sorting request
+  if (isset($_GET['sort']) && isset($_GET['order'])) {
+    // Sort it Ascending or Descending?
+    if ($_GET['sort'] == 'asc')
+      $sort = 'ASC';
+    else
+      $sort = 'DESC';
+
+    // Which column will be sorted
+    switch ($_GET['order']) {
+      case 'Result ID':
+        $order = 'id';
+        break;
+      case 'Date':
+        $order = 'date';
+        break;
+      default:
+        $order = 'id';
+    }
+  }
+  else {
+    // Default sort
+    $sort = 'ASC';
+    $order = 'id';
+  }
+
+  $form = array();
+
+  $page_limit = 20;
+
+  $header = array(
+    array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Date'), 'field' => 'date'),
+    t('Site name'),
+    t('Temp'),
+    t('Oxygen'),
+    t('Salinity'),
+    t('Depth'),
+    );
+  
+   $select = db_select('bamp_environment', 'e')
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+   
+  $select->addField('e', 'id');
+  $select->addField('e', 'date');
+  $select->addField('e', 'site_name');
+  $select->addField('e', 'temp');
+  $select->addField('e', 'oxygen');
+  $select->addField('e', 'sal');
+  $select->addField('e', 'depth');
+  $select->orderBy($order, $sort);
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  $rows = array();
+
+  foreach ($entries as $result) {
+
+    $rows[] = array_map('check_plain', $result);
+  }
+  
+   $nr = count($rows);
+  
+  //  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Environment data/' . $id);
+  }
+  
+  $form['Form'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+    );
+  
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
+  
   return $form;
 }
 
@@ -1079,7 +1196,7 @@ function bamprepweather_form($form_state) {
         $order = 'id';
         break;
       case 'Date':
-        $order = 'fish_id';
+        $order = 'date';
         break;
       default:
         $order = 'id';
@@ -1099,7 +1216,7 @@ function bamprepweather_form($form_state) {
     array('data' => t('Result ID'), 'field' => 'id'),
     array('data' => t('Date'), 'field' => 'date'),
     t('Time'),
-    t('Site ID'),
+    t('Site name'),
     t('Temp'),
     t('High temp'),
     t('Low temp'),
@@ -1122,7 +1239,7 @@ function bamprepweather_form($form_state) {
   $select->addField('w', 'id');
   $select->addField('w', 'date');
   $select->addField('w', 'time');
-  $select->addField('w', 'site_id');
+  $select->addField('w', 'site_name');
   $select->addField('w', 'temp');
   $select->addField('w', 'temp_hi');
   $select->addField('w', 'temp_low');
@@ -1145,6 +1262,14 @@ function bamprepweather_form($form_state) {
     $rows[] = array_map('check_plain', $result);
   }
   
+   $nr = count($rows);
+  
+  //  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Weather data/' . $id);
+  }
+  
   $form['Form'] = array(
       '#theme' => 'table',
       '#header' => $header,
@@ -1161,4 +1286,103 @@ function bamprepweather_form($form_state) {
 
 function bamprepweather_menu_callback() {
   return drupal_get_form('bamprepweather_form');
+}
+
+function bamp_trip_report_form($form_state) {
+  drupal_set_title(t('Trip data'));
+
+  $form = array();
+
+  $content['form'] = array(
+    '#markup' => '<p> This is the BAMP trip form</p>',
+  );
+
+  // Check if there is sorting request
+  if (isset($_GET['sort']) && isset($_GET['order'])) {
+    // Sort it Ascending or Descending?
+    if ($_GET['sort'] == 'asc')
+      $sort = 'ASC';
+    else
+      $sort = 'DESC';
+
+    // Which column will be sorted
+    switch ($_GET['order']) {
+      case 'Result ID':
+        $order = 'id';
+        break;
+      case 'Date':
+        $order = 'date';
+        break;
+      default:
+        $order = 'id';
+    }
+  }
+  else {
+    // Default sort
+    $sort = 'ASC';
+    $order = 'id';
+  }
+
+  $form = array();
+
+  $page_limit = 20;
+
+  $header = array(
+    array('data' => t('Result ID'), 'field' => 'id'),
+    array('data' => t('Date'), 'field' => 'date'),
+    t('Time'),
+    t('Site name'),
+    t('Site ID'),
+    t('Vessel'),
+    t('Method'),
+    t('Comments'),
+    );
+  
+   $select = db_select('bamp_trip', 't')
+      ->extend('TableSort')
+      ->extend("PagerDefault")
+      ->limit($page_limit);
+   
+  $select->addField('t', 'id');
+  $select->addField('t', 'start_date');
+  $select->addField('t', 'start_time');
+  $select->addField('t', 'name');
+  $select->addField('t', 'site_id');
+  $select->addField('t', 'vessel');
+  $select->addField('t', 'method');
+  $select->addField('t', 'comments');
+  $select->orderBy($order, $sort);
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  $rows = array();
+
+  foreach ($entries as $result) {
+
+    $rows[] = array_map('check_plain', $result);
+  }
+  
+   $nr = count($rows);
+  
+  //  Loop to replace the ID text with a link to the edit form for that entry
+  for ($i = 0; $i < $nr; $i++) {
+    $id = $rows[$i]['id'];
+    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Trip data/' . $id);
+  }
+  
+  $form['Form'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+    );
+  
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#quantity' => 10,
+    );
+  
+  return $form;
+}
+
+function bamp_trip_report_menu_callback() {
+  return drupal_get_form('bamp_trip_report_form');
 }

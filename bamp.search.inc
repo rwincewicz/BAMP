@@ -36,7 +36,7 @@ function bamp_search_menu_callback() {
  */
 
 function bamp_search_results_form($form, &$form_state) {
-  drupal_set_title(t('Results search form'));
+  drupal_set_title(t('Field results search form'));
 
   $form = array();
 
@@ -76,6 +76,12 @@ function bamp_search_results_form($form, &$form_state) {
     '#title' => t('Site ID'),
     '#options' => $site_array,
     '#default_value' => 0,
+  );
+  
+  $form['form']['lice_data'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show lice data'),
+    '#default_value' => TRUE,
   );
   
   $form['form']['list_no'] = array(
@@ -139,5 +145,12 @@ function bamp_search_results_form_submit($form, &$form_state) {
     $no_results = $form_state['values']['list_no']; 
   }
   
-  drupal_goto('bamp/Report forms/Field results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results);
+  if ($form_state['values']['lice_data'] == TRUE) {
+    $data = 'y';
+  }
+  else {
+    $data = 'n';
+  }
+  
+  drupal_goto('bamp/Report forms/Field results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results . '/' . $data);
 }

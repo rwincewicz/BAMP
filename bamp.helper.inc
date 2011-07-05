@@ -11,6 +11,9 @@
  * @param type $table
  * @return type 
  */
+
+//  Added conditions to the functions because drupal was complaining about the functions
+//  already having been declared.
 if (!function_exists('next_id_bamp')) {
 
   function next_id_bamp($table) {

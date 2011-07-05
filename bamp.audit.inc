@@ -158,7 +158,7 @@ function bamp_audit_results_form($form, $form_state, $id) {
     $new_array = explode(',', $audit['0']['new_values']);
 
     switch ($audit[0]['edited_table']) {
-      
+
       case 'bamp_field_results':
 
         $select = db_select('bamp_field_results', 'f');
@@ -224,7 +224,7 @@ function bamp_audit_results_form($form, $form_state, $id) {
         $select->addField('f', 'comments');
         $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
         break;
-      
+
       case 'bamp_sites':
 
         $select = db_select('bamp_sites', 's');
@@ -250,7 +250,7 @@ function bamp_audit_results_form($form, $form_state, $id) {
         $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
         break;
 
-    case 'bamp_weather':
+      case 'bamp_weather':
 
         $select = db_select('bamp_weather', 'w');
 
@@ -259,7 +259,7 @@ function bamp_audit_results_form($form, $form_state, $id) {
         $select->addField('w', 'id');
         $select->addField('w', 'date');
         $select->addField('w', 'time');
-        $select->addField('w', 'site_id');
+        $select->addField('w', 'site_name');
         $select->addField('w', 'temp');
         $select->addField('w', 'temp_hi');
         $select->addField('w', 'temp_low');
@@ -274,8 +274,68 @@ function bamp_audit_results_form($form, $form_state, $id) {
         $select->addField('w', 'arc_int');
         $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
         break;
+
+      case 'bamp_environment':
+
+        $select = db_select('bamp_environment', 'e');
+
+        $select->condition('e.id', $id, '=');
+
+        $select->addField('e', 'id');
+        $select->addField('e', 'date');
+        $select->addField('e', 'site_name');
+        $select->addField('e', 'temp');
+        $select->addField('e', 'oxygen');
+        $select->addField('e', 'sal');
+        $select->addField('e', 'depth');
+        $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+        break;
+
+      case 'bamp_trip':
+
+        $select = db_select('bamp_trip', 't');
+
+        $select->condition('t.id', $id, '=');
+
+        $select->addField('t', 'id');
+        $select->addField('t', 'start_date');
+        $select->addField('t', 'start_time');
+        $select->addField('t', 'site_id');
+        $select->addField('t', 'name');
+        $select->addField('t', 'vessel');
+        $select->addField('t', 'method');
+        $select->addField('t', 'comments');
+        $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+        break;
+
+      case 'bamp_lab_results':
+        
+        $table = 'bamp_lab_results';
+
+        $result = db_query("SHOW COLUMNS FROM $table");
+        $query = $result->fetchAll();
+
+        $select = db_select($table, 'l');
+
+        $select->condition('l.id', $id, '=');
+
+        $nq = count($query);
+
+        for ($i = 0; $i < $nq; $i++) {
+
+          $field = $query[$i];
+
+          $fields[] = $field->field;
+
+          $fieldsi = $fields[$i];
+
+          $select->addField('l', $fieldsi);
+        }
+
+        $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+        break;
     }
-    
+
     $keys = array_keys($entries[0]);
 
     $row = array();

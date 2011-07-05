@@ -30,8 +30,8 @@ function bampedit_menu_callback() {
 function bampeditfield_form($form, &$form_state, $id) {
   drupal_set_title(t('Field results edit form'));
 
-  drupal_get_messages();
-  
+  drupal_get_messages('warning');
+
   if ($id == NULL) {
     $form['form'] = array(
       '#type' => 'fieldset',
@@ -129,39 +129,39 @@ function bampeditfield_form($form, &$form_state, $id) {
 
   if ($entries == NULL) {
     drupal_set_message(t('Entry not found!'), 'warning');
-    
+
     $form['form']['id'] = array(
-    '#markup' => 'Id: ' . $id . ' ',
-  );
-  
-  $form['form']['next'] = array(
-    '#type' => 'submit',
-    '#value' => t('Next'),
-  );
-  
-  $form['id'] = array(
-    '#type' => 'hidden',
-    '#value' => $id,
-  );
-  
-  $form['prev'] = array(
-    '#type' => 'hidden',
-    '#value' => 'prev',
-  );
-  
-  $form['reset'] = array(
-    '#type' => 'hidden',
-    '#value' => 'reset',
-  );
-  
-  $form['data'] = array(
-    '#type' => 'hidden',
-    '#value' => 'reset',
-  );
-    
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
     return $form;
   }
-  
+
   $old_values = implode(',', $entries[0]);
 
 //  Assign the data to variables casting them as the proper type so they go back in to the database properly 
@@ -227,11 +227,11 @@ function bampeditfield_form($form, &$form_state, $id) {
     '#type' => 'submit',
     '#value' => t('Prev'),
   );
-  
+
   $form['form']['id'] = array(
     '#markup' => 'Id: ' . $entry_id . ' ',
   );
-  
+
   $form['form']['next'] = array(
     '#type' => 'submit',
     '#value' => t('Next'),
@@ -675,13 +675,13 @@ function bampeditfield_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
     drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
     drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
@@ -748,7 +748,9 @@ function bampeditfield_form_submit($form, &$form_state) {
     $comments = $form_state['values']['comments'];
 
     $new_values = $form_state['values']['id'] . ',';
-    $new_val = array_chunk($form_state['values'], 56);
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
     $new_values .= implode(',', $new_val[0]);
 
 
@@ -843,6 +845,8 @@ function bampeditfield_form_submit($form, &$form_state) {
 function bampeditsite_form($form, &$form_state, $id) {
   drupal_set_title(t('Site data edit form'));
 
+  drupal_get_messages();
+
   if ($id == NULL) {
     $form['form'] = array(
       '#type' => 'fieldset',
@@ -899,9 +903,39 @@ function bampeditsite_form($form, &$form_state, $id) {
 
   if ($entries == NULL) {
     drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
     return $form;
   }
-  
+
   $old_values = implode(',', $entries[0]);
 
 //  Assign the data to variables casting them as the proper type so they go back in to the database properly 
@@ -922,20 +956,20 @@ function bampeditsite_form($form, &$form_state, $id) {
   $year = $entries[0]['year'];
   $group_name = $entries[0]['group_name'];
 
-   $form['form']['prev'] = array(
+  $form['form']['prev'] = array(
     '#type' => 'submit',
     '#value' => t('Prev'),
   );
-  
+
   $form['form']['id'] = array(
     '#markup' => 'Id: ' . $entry_id,
   );
 
-   $form['form']['next'] = array(
+  $form['form']['next'] = array(
     '#type' => 'submit',
     '#value' => t('Next'),
   );
-  
+
   $form['form']['craw_site_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Crawford Site ID'),
@@ -1069,13 +1103,13 @@ function bampeditsite_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
     drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
     drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
@@ -1101,7 +1135,9 @@ function bampeditsite_form_submit($form, &$form_state) {
     $group_name = $form_state['values']['group_name'];
 
     $new_values = $form_state['values']['id'] . ',';
-    $new_val = array_chunk($form_state['values'], 56);
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
     $new_values .= implode(',', $new_val[0]);
 
 
@@ -1155,6 +1191,8 @@ function bampeditsite_form_submit($form, &$form_state) {
 function bampeditweather_form($form, &$form_state, $id) {
   drupal_set_title(t('Weather data edit form'));
 
+  drupal_get_messages();
+
   if ($id == NULL) {
     $form['form'] = array(
       '#type' => 'fieldset',
@@ -1194,7 +1232,7 @@ function bampeditweather_form($form, &$form_state, $id) {
   $select->addField('w', 'id');
   $select->addField('w', 'date');
   $select->addField('w', 'time');
-  $select->addField('w', 'site_id');
+  $select->addField('w', 'site_name');
   $select->addField('w', 'temp');
   $select->addField('w', 'temp_hi');
   $select->addField('w', 'temp_low');
@@ -1211,16 +1249,46 @@ function bampeditweather_form($form, &$form_state, $id) {
 
   if ($entries == NULL) {
     drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
     return $form;
   }
-  
+
   $old_values = implode(',', $entries[0]);
 
 //  Assign the data to variables casting them as the proper type so they go back in to the database properly 
   $entry_id = (int) $entries[0]['id'];
   $date = $entries[0]['date'];
   $time = $entries[0]['time'];
-  $site_id = $entries[0]['site_id'];
+  $site_name = $entries[0]['site_name'];
   $temp = $entries[0]['temp'];
   $temp_hi = $entries[0]['temp_hi'];
   $temp_low = $entries[0]['temp_low'];
@@ -1234,20 +1302,20 @@ function bampeditweather_form($form, &$form_state, $id) {
   $bar = $entries[0]['bar'];
   $arc_int = $entries[0]['arc_int'];
 
-   $form['form']['prev'] = array(
+  $form['form']['prev'] = array(
     '#type' => 'submit',
     '#value' => t('Prev'),
   );
-  
+
   $form['form']['id'] = array(
     '#markup' => 'Id: ' . $entry_id,
   );
 
-   $form['form']['next'] = array(
+  $form['form']['next'] = array(
     '#type' => 'submit',
     '#value' => t('Next'),
   );
-  
+
   $form['form']['date'] = array(
     '#type' => 'textfield',
     '#title' => t('Date'),
@@ -1260,10 +1328,10 @@ function bampeditweather_form($form, &$form_state, $id) {
     '#default_value' => $time,
   );
 
-  $form['form']['site_id'] = array(
+  $form['form']['site_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Site ID'),
-    '#default_value' => $site_id,
+    '#title' => t('Site name'),
+    '#default_value' => $site_name,
   );
 
   $form['form']['temp'] = array(
@@ -1381,13 +1449,13 @@ function bampeditweather_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
     drupal_goto('bamp/Edit forms/Weather data/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
     drupal_goto('bamp/Edit forms/Weather data/' . $id);
   }
-  
+
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
@@ -1398,7 +1466,7 @@ function bampeditweather_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
     $date = $form_state['values']['date'];
     $time = $form_state['values']['time'];
-    $site_id = $form_state['values']['site_id'];
+    $site_name = $form_state['values']['site_name'];
     $temp = $form_state['values']['temp'];
     $temp_hi = $form_state['values']['temp_hi'];
     $temp_low = $form_state['values']['temp_low'];
@@ -1413,7 +1481,9 @@ function bampeditweather_form_submit($form, &$form_state) {
     $arc_int = $form_state['values']['arc_int'];
 
     $new_values = $form_state['values']['id'] . ',';
-    $new_val = array_chunk($form_state['values'], 56);
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
     $new_values .= implode(',', $new_val[0]);
 
 
@@ -1426,7 +1496,7 @@ function bampeditweather_form_submit($form, &$form_state) {
         ->fields(array(
           'date' => $date,
           'time' => $time,
-          'site_id' => $site_id,
+          'site_name' => $site_name,
           'temp' => $temp,
           'temp_hi' => $temp_hi,
           'temp_low' => $temp_low,
@@ -1454,5 +1524,817 @@ function bampeditweather_form_submit($form, &$form_state) {
 
     drupal_set_message(t('Entry edited successfully!'));
     drupal_goto('bamp/Edit forms/Weather data/' . $id);
+  }
+}
+
+/**
+ * Form for editing individual environmental entries
+ * @param type $form
+ * @param type $form_state
+ * @param type $id
+ * @return string 
+ */
+function bampeditenvironment_form($form, &$form_state, $id) {
+  drupal_set_title(t('Environment data edit form'));
+
+  drupal_get_messages();
+
+  if ($id == NULL) {
+    $form['form'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Entry details'),
+    );
+
+    $form['form']['id'] = array(
+      '#markup' => 'Enter ID',
+    );
+
+    $form['form']['newid'] = array(
+      '#type' => 'textfield',
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'new',
+    );
+
+    return $form;
+  }
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Entry details'),
+  );
+
+  $select = db_select('bamp_environment', 'e');
+
+  $select->condition('e.id', $id, '=');
+
+  $select->addField('e', 'id');
+  $select->addField('e', 'date');
+  $select->addField('e', 'site_name');
+  $select->addField('e', 'temp');
+  $select->addField('e', 'oxygen');
+  $select->addField('e', 'sal');
+  $select->addField('e', 'depth');
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($entries == NULL) {
+    drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    return $form;
+  }
+
+  $old_values = implode(',', $entries[0]);
+
+//  Assign the data to variables casting them as the proper type so they go back in to the database properly 
+  $entry_id = (int) $entries[0]['id'];
+  $date = $entries[0]['date'];
+  $site_name = $entries[0]['site_name'];
+  $temp = $entries[0]['temp'];
+  $oxygen = $entries[0]['oxygen'];
+  $sal = $entries[0]['sal'];
+  $depth = $entries[0]['depth'];
+
+  $form['form']['prev'] = array(
+    '#type' => 'submit',
+    '#value' => t('Prev'),
+  );
+
+  $form['form']['id'] = array(
+    '#markup' => 'Id: ' . $entry_id,
+  );
+
+  $form['form']['next'] = array(
+    '#type' => 'submit',
+    '#value' => t('Next'),
+  );
+
+  $form['form']['date'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Date'),
+    '#default_value' => $date,
+  );
+
+  $form['form']['site_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site name'),
+    '#default_value' => $site_name,
+  );
+
+  $form['form']['temp'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Temp'),
+    '#default_value' => $temp,
+  );
+
+  $form['form']['oxygen'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Oxygen'),
+    '#default_value' => $oxygen,
+  );
+
+  $form['form']['sal'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Salinity'),
+    '#default_value' => $sal,
+  );
+
+  $form['form']['depth'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Depth'),
+    '#default_value' => $depth,
+  );
+
+  $form['edit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Edit',
+  );
+
+  $form['reset'] = array(
+    '#type' => 'submit',
+    '#value' => 'Reset',
+  );
+
+  $form['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $id,
+  );
+
+  $form['old_values'] = array(
+    '#type' => 'hidden',
+    '#value' => $old_values,
+  );
+
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => 'reset',
+  );
+
+  return $form;
+}
+
+function bampeditenvironment_menu_callback($id=NULL) {
+  return drupal_get_form('bampeditenvironment_form', $id);
+}
+
+function bampeditenvironment_form_submit($form, &$form_state) {
+  if ($form_state['values']['data'] == 'new') {
+    $id = $form_state['values']['newid'];
+    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
+    $id = $form_state['values']['id'];
+    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
+    $id = $form_state['values']['id'];
+    --$id;
+    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
+    $id = $form_state['values']['id'];
+    ++$id;
+    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
+    $id = $form_state['values']['id'];
+    $date = $form_state['values']['date'];
+    $site_name = $form_state['values']['site_name'];
+    $temp = $form_state['values']['temp'];
+    $oxygen = $form_state['values']['oxygen'];
+    $sal = $form_state['values']['sal'];
+    $depth = $form_state['values']['depth'];
+
+    $new_values = $form_state['values']['id'] . ',';
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
+
+    $new_values .= implode(',', $new_val[0]);
+
+    $old_values = $form_state['values']['old_values'];
+
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+
+    $entry_update = db_update('bamp_environment')
+        ->fields(array(
+          'date' => $date,
+          'site_name' => $site_name,
+          'temp' => $temp,
+          'oxygen' => $oxygen,
+          'sal' => $sal,
+          'depth' => $depth,
+        ))
+        ->condition('id', $id, '=')
+        ->execute();
+
+    $audit = db_insert('bamp_audit')
+        ->fields(array(
+          'edited_table' => 'bamp_environment',
+          'old_values' => $old_values,
+          'new_values' => $new_values,
+          'user' => $username,
+        ))
+        ->execute();
+
+    drupal_set_message(t('Entry edited successfully!'));
+    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+  }
+}
+
+/**
+ * Form to edit individual lab results
+ * @param type $form
+ * @param type $form_state
+ * @param type $id
+ * @return string 
+ */
+function bampeditlab_form($form, &$form_state, $id) {
+  drupal_set_title(t('Lab results edit form'));
+
+  drupal_get_messages('warning');
+
+  if ($id == NULL) {
+    $form['form'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Entry details'),
+    );
+
+    $form['form']['id'] = array(
+      '#markup' => 'Enter ID',
+    );
+
+    $form['form']['newid'] = array(
+      '#type' => 'textfield',
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'new',
+    );
+
+    return $form;
+  }
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Entry details'),
+  );
+
+  $table = 'bamp_lab_results';
+
+  $result = db_query("SHOW COLUMNS FROM $table");
+  $query = $result->fetchAll();
+
+  $select = db_select($table, 'l');
+
+  $select->condition('l.id', $id, '=');
+
+  $nq = count($query);
+
+  for ($i = 0; $i < $nq; $i++) {
+
+    $field = $query[$i];
+
+    $fields[] = $field->field;
+
+    $fieldsi = $fields[$i];
+
+    $select->addField('l', $fieldsi);
+  }
+
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($entries == NULL) {
+    drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    return $form;
+  }
+
+  $entry_id = (int) $entries[0]['id'];
+
+  $form['form']['prev'] = array(
+    '#type' => 'submit',
+    '#value' => t('Prev'),
+  );
+
+  $form['form']['id'] = array(
+    '#markup' => 'Id: ' . $entry_id . ' ',
+  );
+
+  $form['form']['next'] = array(
+    '#type' => 'submit',
+    '#value' => t('Next'),
+  );
+
+  $old_values = implode(',', $entries[0]);
+
+  for ($i = 1; $i < $nq; $i++) {
+
+    $fieldsi = $fields[$i];
+
+    ${$fieldsi} = $entries[0][$fieldsi];
+
+    $form['form'][$fieldsi] = array(
+      '#type' => 'textfield',
+      '#title' => t("@fieldsi", array('@fieldsi' => $fieldsi)),
+      '#default_value' => $entries[0][$fieldsi],
+    );
+  }
+
+  $form['edit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Edit',
+  );
+
+  $form['reset'] = array(
+    '#type' => 'submit',
+    '#value' => 'Reset',
+  );
+
+  $form['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $id,
+  );
+
+  $form['old_values'] = array(
+    '#type' => 'hidden',
+    '#value' => $old_values,
+  );
+
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => 'reset',
+  );
+
+  return $form;
+}
+
+function bampeditlab_menu_callback($id=NULL) {
+  return drupal_get_form('bampeditlab_form', $id);
+}
+
+function bampeditlab_form_submit($form, &$form_state) {
+  if ($form_state['values']['data'] == 'new') {
+    $id = $form_state['values']['newid'];
+    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
+    $id = $form_state['values']['id'];
+    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
+    $id = $form_state['values']['id'];
+    --$id;
+    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
+    $id = $form_state['values']['id'];
+    ++$id;
+    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
+    $id = $form_state['values']['id'];
+    $fish_id = $form_state['values']['fish_id'];
+    $date = $form_state['values']['date'];
+    $species = $form_state['values']['species'];
+    $length = $form_state['values']['length'];
+    $weight = $form_state['values']['weight'];
+    $total_lep = $form_state['values']['total_lep'];
+    $total_caligus = $form_state['values']['total_caligus'];
+    $total_lice = $form_state['values']['total_lice'];
+    $lep_c0 = $form_state['values']['lep_c0'];
+    $lep_c1 = $form_state['values']['lep_c1'];
+    $lep_c2 = $form_state['values']['lep_c2'];
+    $lep_c3 = $form_state['values']['lep_c3'];
+    $lep_c4m = $form_state['values']['lep_c4m'];
+    $lep_c4f = $form_state['values']['lep_c4f'];
+    $lep_pam = $form_state['values']['lep_pam'];
+    $lep_paf = $form_state['values']['lep_paf'];
+    $lep_am = $form_state['values']['lep_am'];
+    $lep_af = $form_state['values']['lep_af'];
+    $cal_c0 = $form_state['values']['cal_c0'];
+    $cal_c1 = $form_state['values']['cal_c1'];
+    $cal_c2 = $form_state['values']['cal_c2'];
+    $cal_c3 = $form_state['values']['cal_c3'];
+    $cal_c4m = $form_state['values']['cal_c4m'];
+    $cal_c4f = $form_state['values']['cal_c4f'];
+    $cal_pam = $form_state['values']['cal_pam'];
+    $cal_paf = $form_state['values']['cal_paf'];
+    $cal_am = $form_state['values']['cal_am'];
+    $cal_af = $form_state['values']['cal_af'];
+    $lep_nm_notid = $form_state['values']['lep_nm_notid'];
+    $lep_mot_notid = $form_state['values']['lep_mot_notid'];
+    $cal_nm_notid = $form_state['values']['cal_nm_notid'];
+    $cal_mot_notid = $form_state['values']['cal_mot_notid'];
+    $condition_factor = $form_state['values']['condition_factor'];
+    $comments = $form_state['values']['comments'];
+
+    $new_values = $form_state['values']['id'] . ',';
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
+    $new_values .= implode(',', $new_val[0]);
+
+
+    $old_values = $form_state['values']['old_values'];
+
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+
+    $entry_update = db_update('bamp_lab_results')
+        ->fields(array(
+          'fish_id' => $fish_id,
+          'date' => $date,
+          'species' => $species,
+          'length' => $length,
+          'weight' => $weight,
+          'total_lep' => $total_lep,
+          'total_caligus' => $total_caligus,
+          'total_lice' => $total_lice,
+          'lep_c0' => $lep_c0,
+          'lep_c1' => $lep_c1,
+          'lep_c2' => $lep_c2,
+          'lep_c3' => $lep_c3,
+          'lep_c4m' => $lep_c4m,
+          'lep_c4f' => $lep_c4f,
+          'lep_pam' => $lep_pam,
+          'lep_paf' => $lep_paf,
+          'lep_am' => $lep_am,
+          'lep_af' => $lep_af,
+          'cal_c0' => $cal_c0,
+          'cal_c1' => $cal_c1,
+          'cal_c2' => $cal_c2,
+          'cal_c3' => $cal_c3,
+          'cal_c4m' => $cal_c4m,
+          'cal_c4f' => $cal_c4f,
+          'cal_pam' => $cal_pam,
+          'cal_paf' => $cal_paf,
+          'cal_am' => $cal_am,
+          'cal_af' => $cal_af,
+          'lep_nm_notid' => $lep_nm_notid,
+          'lep_mot_notid' => $lep_mot_notid,
+          'cal_nm_notid' => $cal_nm_notid,
+          'cal_mot_notid' => $cal_mot_notid,
+          'condition_factor' => $condition_factor,
+          'comments' => $comments,
+        ))
+        ->condition('id', $id, '=')
+        ->execute();
+
+    $audit = db_insert('bamp_audit')
+        ->fields(array(
+          'edited_table' => 'bamp_lab_results',
+          'old_values' => $old_values,
+          'new_values' => $new_values,
+          'user' => $username,
+        ))
+        ->execute();
+
+    drupal_set_message(t('Entry edited successfully!'));
+    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+  }
+}
+
+/**
+ * Form for editing individual trip entries
+ * @param type $form
+ * @param type $form_state
+ * @param type $id
+ * @return string 
+ */
+function bamp_trip_edit_form($form, &$form_state, $id) {
+  drupal_set_title(t('Trip data edit form'));
+
+  drupal_get_messages();
+
+  if ($id == NULL) {
+    $form['form'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Entry details'),
+    );
+
+    $form['form']['id'] = array(
+      '#markup' => 'Enter ID',
+    );
+
+    $form['form']['newid'] = array(
+      '#type' => 'textfield',
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'new',
+    );
+
+    return $form;
+  }
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Entry details'),
+  );
+
+  $select = db_select('bamp_trip', 't');
+
+  $select->condition('t.id', $id, '=');
+
+  $select->addField('t', 'id');
+  $select->addField('t', 'start_date');
+  $select->addField('t', 'start_time');
+  $select->addField('t', 'site_id');
+  $select->addField('t', 'name');
+  $select->addField('t', 'vessel');
+  $select->addField('t', 'method');
+  $select->addField('t', 'comments');
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($entries == NULL) {
+    drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    return $form;
+  }
+
+  $old_values = implode(',', $entries[0]);
+
+//  Assign the data to variables casting them as the proper type so they go back in to the database properly 
+  $entry_id = (int) $entries[0]['id'];
+  $start_date = $entries[0]['start_date'];
+  $start_time = $entries[0]['start_time'];
+  $site_id = $entries[0]['site_id'];
+  $name = $entries[0]['name'];
+  $vessel = $entries[0]['vessel'];
+  $method = $entries[0]['method'];
+  $comments = $entries[0]['comments'];
+
+  $form['form']['prev'] = array(
+    '#type' => 'submit',
+    '#value' => t('Prev'),
+  );
+
+  $form['form']['id'] = array(
+    '#markup' => 'Id: ' . $entry_id,
+  );
+
+  $form['form']['next'] = array(
+    '#type' => 'submit',
+    '#value' => t('Next'),
+  );
+
+  $form['form']['start_date'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Date'),
+    '#default_value' => $start_date,
+  );
+
+  $form['form']['start_time'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Time'),
+    '#default_value' => $start_time,
+  );
+
+  $form['form']['site_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site ID'),
+    '#default_value' => $site_id,
+  );
+
+  $form['form']['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Temp'),
+    '#default_value' => $name,
+  );
+
+  $form['form']['vessel'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Vessel'),
+    '#default_value' => $vessel,
+  );
+
+  $form['form']['method'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Method'),
+    '#default_value' => $method,
+  );
+
+  $form['form']['comments'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Comments'),
+    '#default_value' => $comments,
+  );
+
+  $form['edit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Edit',
+  );
+
+  $form['reset'] = array(
+    '#type' => 'submit',
+    '#value' => 'Reset',
+  );
+
+  $form['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $id,
+  );
+
+  $form['old_values'] = array(
+    '#type' => 'hidden',
+    '#value' => $old_values,
+  );
+
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => 'reset',
+  );
+
+  return $form;
+}
+
+function bamp_trip_edit_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_trip_edit_form', $id);
+}
+
+function bamp_trip_edit_form_submit($form, &$form_state) {
+  if ($form_state['values']['data'] == 'new') {
+    $id = $form_state['values']['newid'];
+    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
+    $id = $form_state['values']['id'];
+    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
+    $id = $form_state['values']['id'];
+    --$id;
+    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
+    $id = $form_state['values']['id'];
+    ++$id;
+    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+  }
+
+  if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
+    $id = $form_state['values']['id'];
+    $start_date = $form_state['values']['start_date'];
+    $start_time = $form_state['values']['start_time'];
+    $site_id = $form_state['values']['site_id'];
+    $name = $form_state['values']['name'];
+    $vessel = $form_state['values']['vessel'];
+    $method = $form_state['values']['method'];
+    $comments = $form_state['values']['comments'];
+
+    $new_values = $form_state['values']['id'] . ',';
+    $new_val = array_chunk($form_state['values'], 58);
+    $one = array_shift($new_val[0]);
+    $two = array_shift($new_val[0]);
+
+    $new_values .= implode(',', $new_val[0]);
+
+    $old_values = $form_state['values']['old_values'];
+
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+
+    $entry_update = db_update('bamp_trip')
+        ->fields(array(
+          'start_date' => $start_date,
+          'start_time' => $start_time,
+          'site_id' => $site_id,
+          'name' => $name,
+          'vessel' => $vessel,
+          'method' => $method,
+          'comments' => $comments,
+        ))
+        ->condition('id', $id, '=')
+        ->execute();
+
+    $audit = db_insert('bamp_audit')
+        ->fields(array(
+          'edited_table' => 'bamp_trip',
+          'old_values' => $old_values,
+          'new_values' => $new_values,
+          'user' => $username,
+        ))
+        ->execute();
+
+    drupal_set_message(t('Entry edited successfully!'));
+    drupal_goto('bamp/Edit forms/Trip data/' . $id);
   }
 }
