@@ -281,7 +281,7 @@ function bamp_menu() {
   );
 
   $items['bamp/Search forms/Results'] = array(
-    'title' => 'Field search Results',
+    'title' => 'Search Field Results',
     'page callback' => 'bamp_search_results_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),

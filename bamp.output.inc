@@ -15,7 +15,7 @@ function bampreport_form($form_state) {
 
   $form = array();
 
-  $content['form'] = array(
+  $form['form'] = array(
     '#markup' => '<p> This is the BAMP report menu</p>',
   );
 
@@ -879,6 +879,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     t('Lep_C3'),
     t('Lep_C4M'),
     t('Lep_C4F'),
+    t('Total Lep_C4'),
     t('Lep_PAM'),
     t('Lep_PAF'),
     t('Lep_AM'),
@@ -892,6 +893,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     t('Cal_C3'),
     t('Cal_C4M'),
     t('Cal_C4F'),
+    t('Total Cal_C4'),
     t('Cal_PAM'),
     t('Cal_PAF'),
     t('Cal_AM'),
@@ -961,6 +963,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   $select->addField('l', 'lep_c3');
   $select->addField('l', 'lep_c4m');
   $select->addField('l', 'lep_c4f');
+  $select->addField('l', 'total_lep_c4');
   $select->addField('l', 'lep_pam');
   $select->addField('l', 'lep_paf');
   $select->addField('l', 'lep_am');
@@ -974,6 +977,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   $select->addField('l', 'cal_c3');
   $select->addField('l', 'cal_c4m');
   $select->addField('l', 'cal_c4f');
+  $select->addField('l', 'total_cal_c4');
   $select->addField('l', 'cal_pam');
   $select->addField('l', 'cal_paf');
   $select->addField('l', 'cal_am');

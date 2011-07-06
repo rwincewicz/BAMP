@@ -16,7 +16,7 @@ function bampedit_form($form_state) {
 
   $form = array();
 
-  $content['form'] = array(
+  $form['form'] = array(
     '#markup' => '<p> This is the BAMP edit menu</p>',
   );
 
@@ -845,7 +845,7 @@ function bampeditfield_form_submit($form, &$form_state) {
 function bampeditsite_form($form, &$form_state, $id) {
   drupal_set_title(t('Site data edit form'));
 
-  drupal_get_messages();
+  drupal_get_messages('warning');
 
   if ($id == NULL) {
     $form['form'] = array(
@@ -1191,7 +1191,7 @@ function bampeditsite_form_submit($form, &$form_state) {
 function bampeditweather_form($form, &$form_state, $id) {
   drupal_set_title(t('Weather data edit form'));
 
-  drupal_get_messages();
+  drupal_get_messages('warning');
 
   if ($id == NULL) {
     $form['form'] = array(
@@ -1537,7 +1537,7 @@ function bampeditweather_form_submit($form, &$form_state) {
 function bampeditenvironment_form($form, &$form_state, $id) {
   drupal_set_title(t('Environment data edit form'));
 
-  drupal_get_messages();
+  drupal_get_messages('warning');
 
   if ($id == NULL) {
     $form['form'] = array(
@@ -1760,9 +1760,9 @@ function bampeditenvironment_form_submit($form, &$form_state) {
         ->fields(array(
           'date' => $date,
           'site_name' => $site_name,
-          'temp' => $temp,
-          'oxygen' => $oxygen,
-          'sal' => $sal,
+          'temp' => (float) $temp,
+          'oxygen' => (float) $oxygen,
+          'sal' => (float) $sal,
           'depth' => $depth,
         ))
         ->condition('id', $id, '=')
@@ -1975,7 +1975,10 @@ function bampeditlab_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
     $fish_id = $form_state['values']['fish_id'];
     $date = $form_state['values']['date'];
+    $lab_id = $form_state['values']['lab_id'];
     $species = $form_state['values']['species'];
+    $method = $form_state['values']['method'];
+    $people = $form_state['values']['people'];
     $length = $form_state['values']['length'];
     $weight = $form_state['values']['weight'];
     $total_lep = $form_state['values']['total_lep'];
@@ -2006,6 +2009,7 @@ function bampeditlab_form_submit($form, &$form_state) {
     $cal_nm_notid = $form_state['values']['cal_nm_notid'];
     $cal_mot_notid = $form_state['values']['cal_mot_notid'];
     $condition_factor = $form_state['values']['condition_factor'];
+    $scarring = $form_state['values']['scarring'];
     $comments = $form_state['values']['comments'];
 
     $new_values = $form_state['values']['id'] . ',';
@@ -2024,37 +2028,41 @@ function bampeditlab_form_submit($form, &$form_state) {
         ->fields(array(
           'fish_id' => $fish_id,
           'date' => $date,
+          'lab_id' => $lab_id,
           'species' => $species,
+          'method' => $method,
+          'people' => $people,
           'length' => $length,
           'weight' => $weight,
-          'total_lep' => $total_lep,
-          'total_caligus' => $total_caligus,
-          'total_lice' => $total_lice,
-          'lep_c0' => $lep_c0,
-          'lep_c1' => $lep_c1,
-          'lep_c2' => $lep_c2,
-          'lep_c3' => $lep_c3,
-          'lep_c4m' => $lep_c4m,
-          'lep_c4f' => $lep_c4f,
-          'lep_pam' => $lep_pam,
-          'lep_paf' => $lep_paf,
-          'lep_am' => $lep_am,
-          'lep_af' => $lep_af,
-          'cal_c0' => $cal_c0,
-          'cal_c1' => $cal_c1,
-          'cal_c2' => $cal_c2,
-          'cal_c3' => $cal_c3,
-          'cal_c4m' => $cal_c4m,
-          'cal_c4f' => $cal_c4f,
-          'cal_pam' => $cal_pam,
-          'cal_paf' => $cal_paf,
-          'cal_am' => $cal_am,
-          'cal_af' => $cal_af,
-          'lep_nm_notid' => $lep_nm_notid,
-          'lep_mot_notid' => $lep_mot_notid,
-          'cal_nm_notid' => $cal_nm_notid,
-          'cal_mot_notid' => $cal_mot_notid,
-          'condition_factor' => $condition_factor,
+          'total_lep' => (int) $total_lep,
+          'total_caligus' => (int) $total_caligus,
+          'total_lice' => (int) $total_lice,
+          'lep_c0' => (int) $lep_c0,
+          'lep_c1' => (int) $lep_c1,
+          'lep_c2' => (int) $lep_c2,
+          'lep_c3' => (int) $lep_c3,
+          'lep_c4m' => (int) $lep_c4m,
+          'lep_c4f' => (int) $lep_c4f,
+          'lep_pam' => (int) $lep_pam,
+          'lep_paf' => (int) $lep_paf,
+          'lep_am' => (int) $lep_am,
+          'lep_af' => (int) $lep_af,
+          'cal_c0' => (int) $cal_c0,
+          'cal_c1' => (int) $cal_c1,
+          'cal_c2' => (int) $cal_c2,
+          'cal_c3' => (int) $cal_c3,
+          'cal_c4m' => (int) $cal_c4m,
+          'cal_c4f' => (int) $cal_c4f,
+          'cal_pam' => (int) $cal_pam,
+          'cal_paf' => (int) $cal_paf,
+          'cal_am' => (int) $cal_am,
+          'cal_af' => (int) $cal_af,
+          'lep_nm_notid' => (int) $lep_nm_notid,
+          'lep_mot_notid' => (int) $lep_mot_notid,
+          'cal_nm_notid' => (int) $cal_nm_notid,
+          'cal_mot_notid' => (int) $cal_mot_notid,
+          'condition_factor' => (float) $condition_factor,
+          'scarring' => $scarring,
           'comments' => $comments,
         ))
         ->condition('id', $id, '=')
@@ -2084,7 +2092,7 @@ function bampeditlab_form_submit($form, &$form_state) {
 function bamp_trip_edit_form($form, &$form_state, $id) {
   drupal_set_title(t('Trip data edit form'));
 
-  drupal_get_messages();
+  drupal_get_messages('warning');
 
   if ($id == NULL) {
     $form['form'] = array(

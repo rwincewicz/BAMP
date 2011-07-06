@@ -12,7 +12,7 @@ function bamp_maps_form($form_state) {
 
   $form = array();
 
-  $content['form'] = array(
+  $form['form'] = array(
     '#markup' => '<p>This is the BAMP map menu</p>',
   );
 

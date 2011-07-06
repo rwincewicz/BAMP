@@ -18,11 +18,11 @@
 function bamp_input_menu_callback() {
   drupal_set_title(t('BAMP Input Menu'));
 
-  $content['form'] = array(
+  $form['form'] = array(
     '#markup' => '<p> This is the BAMP input menu</p>',
   );
 
-  return $content;
+  return $form;
 }
 
 /**

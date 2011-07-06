@@ -20,12 +20,16 @@ function bamp_upload_form($form_state) {
   $form = array();
 
   $form['form'] = array(
-    '#markup' => '<A href="?q=bamp/Upload%20forms/Crawford%20Site%20CSV%20upload">Crawford Site CSV upload</A></br>
-      <A href="?q=bamp/Upload%20forms/Crawford%20field%20results%20CSV%20upload">Crawford field results CSV upload</A></br>
-      <A href="?q=bamp/Upload%20forms/Crawford%20lab%20results%20CSV%20upload">Crawford lab results CSV upload</A></br>
-      <A href="?q=bamp/Upload%20forms/Marty%20field%20results%20CSV%20upload">Marty field results CSV upload</A></br>
-      <A href="?q=bamp/Upload%20forms/Marty%20site%20results%20CSV%20upload">Marty site results CSV upload</A></br>',
+    '#markup' => '<p>This is the BAMP upload menu</p>',
   );
+  
+//  $form['form'] = array(
+//    '#markup' => '<A href="?q=bamp/Upload%20forms/Crawford%20Site%20CSV%20upload">Crawford Site CSV upload</A></br>
+//      <A href="?q=bamp/Upload%20forms/Crawford%20field%20results%20CSV%20upload">Crawford field results CSV upload</A></br>
+//      <A href="?q=bamp/Upload%20forms/Crawford%20lab%20results%20CSV%20upload">Crawford lab results CSV upload</A></br>
+//      <A href="?q=bamp/Upload%20forms/Marty%20field%20results%20CSV%20upload">Marty field results CSV upload</A></br>
+//      <A href="?q=bamp/Upload%20forms/Marty%20site%20results%20CSV%20upload">Marty site results CSV upload</A></br>',
+//  );
 
   return $form;
 }
@@ -66,15 +70,6 @@ function bampupcrawfield_form($form_state) {
 
 function bampupcrawfield_menu_callback() {
   return drupal_get_form('bampupcrawfield_form');
-}
-
-function bampupcrawfield_permission() {
-  return array(
-    'upload form' => array(
-      'title' => t('Upload data'),
-      'description' => t('Batch upload CSV files'),
-    ),
-  );
 }
 
 function bampupcrawfield_form_validate($form, &$form_state) {
@@ -121,9 +116,11 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $site = $aa[$j][7];
 
     $site_name = trim(str_replace("  ", " ", $site));
+    $site_name = str_replace(',', ';', $site_name);
 
     $samp_id = $aa[$j][8];
     $crew = $aa[$j][9];
+    $crew = str_replace(',', ';', $crew);
     $scar_chal = $aa[$j][10];
     $scar_mob = $aa[$j][11];
     $tlice = $aa[$j][12];
@@ -144,6 +141,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     $total_cal_adult = $cal_adult_male + $cal_adult_female;
     $total_cal = $cal_pre_male + $cal_pre_female + $cal_adult_male + $cal_adult_female;
     $comm = $aa[$j][25];
+    $comm = str_replace(',', ';', $comm);
     $total_motile = $total_cal_pre + $total_cal_adult + $total_lep_pre + $total_lep_adult;
 
     if ($species == 'Xcoho') {
@@ -348,7 +346,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = csv2aa($csv_file_path, ';');
   $na = (count($aa) - 1);
 
   drupal_set_message(t('There are ' . $na . ' entries in this file'));
@@ -365,9 +363,60 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $lspecies = $aa[$j][7];
     $length = $aa[$j][8];
     $weight = $aa[$j][9];
-    $total_lice = $aa[$j][30];
-    $comm = $aa[$j][32];
 
+    $lep_c0 = $aa[$j][10];
+    $lep_c1 = $aa[$j][11];
+    $lep_c2 = $aa[$j][12];
+    $lep_c3 = $aa[$j][13];
+    $lep_c4 = $aa[$j][14];
+    $lep_pam = $aa[$j][15];
+    $lep_paf = $aa[$j][16];
+    $lep_am = $aa[$j][17];
+    $lep_af = $aa[$j][18];
+    
+    if ($aa[$j][19] !== '') {
+      $total_lep = $aa[$j][19];
+    }
+    else {
+      $total_lep = NULL;
+    }
+    
+    $cal_c0 = $aa[$j][20];
+    $cal_c1 = $aa[$j][21];
+    $cal_c2 = $aa[$j][22];
+    $cal_c3 = $aa[$j][23];
+    $cal_c4 = $aa[$j][24];
+    $cal_pam = $aa[$j][25];
+    $cal_paf = $aa[$j][26];
+    $cal_am = $aa[$j][27];
+    $cal_af = $aa[$j][28];
+    
+    if ($aa[$j][29] !== '') {
+      $total_cal = $aa[$j][29];
+    }
+    else {
+      $total_cal = NULL;
+    }
+
+    if ($aa[$j][30] !== '') {
+      $total_lice = $aa[$j][30];
+    }
+    else {
+      $total_lice = NULL;
+    }
+    
+    $lesions = $aa[$j][31];
+    $lesions = str_replace(',', ';', $lesions);
+
+    $comments = $aa[$j][32];
+    $comments = str_replace(',', ';', $comments);
+    
+    $change_log = $aa[$j][33];
+    $change_log = str_replace(',', ';', $change_log);
+    
+    $uid = user_uid_optional_to_arg('%');
+    $username = user_name($uid);
+    
     if ($lspecies == '') {
       $lspecies = 'Same';
     }
@@ -383,8 +432,30 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
           'species' => $lspecies,
           'length' => $length,
           'weight' => $weight,
+          'upload_user' => $username,
+          'total_lep' => $total_lep,
+          'total_caligus' => $total_cal,
           'total_lice' => $total_lice,
-          'comments' => $comm,
+          'lep_c0' => $lep_c0,
+          'lep_c1' => $lep_c1,
+          'lep_c2' => $lep_c2,
+          'lep_c3' => $lep_c3,
+          'total_lep_c4' => $lep_c4,
+          'lep_pam' => $lep_pam,
+          'lep_paf' => $lep_paf,
+          'lep_am' => $lep_am,
+          'lep_af' => $lep_af,
+          'cal_c0' => $cal_c0,
+          'cal_c1' => $cal_c1,
+          'cal_c2' => $cal_c2,
+          'cal_c3' => $cal_c3,
+          'total_cal_c4' => $cal_c4,
+          'cal_pam' => $cal_pam,
+          'cal_paf' => $cal_paf,
+          'cal_am' => $cal_am,
+          'cal_af' => $cal_af,
+          'comments' => $comments,
+          'group_name' => 'crawford',
         ))
         ->execute();
   }
@@ -495,6 +566,7 @@ function bampupmartyfield_form_submit($form, &$form_state) {
     $pin_belly = $aa[$j][26];
     $tissue_damage = $aa[$j][27];
     $comm = $aa[$j][28];
+    $comm = str_replace(',', ';', $comm);
     $total_motile = $total_lep + $total_cal;
     $total_lice = $total_cop + $total_chal + $total_cal + $total_lep;
     $route_let = substr($route, 0, 1);
@@ -1086,7 +1158,9 @@ function dfo_field_csv_form_submit($form, &$form_state) {
     $size = $aa[$j][2];
     $no_caught = $aa[$j][5];
     $comments = $aa[$j][7];
+    $comments = str_replace(',', ';', $comments);
     $change_log = $aa[$j][8];
+    $change_log = str_replace(',', ';', $change_log);
 
     $uid = user_uid_optional_to_arg('%');
     $username = user_name($uid);
@@ -1193,6 +1267,7 @@ function dfo_site_csv_form_submit($form, &$form_state) {
     $salinity = $aa[$j][14];
     $refractometer = $aa[$j][15];
     $comments = $aa[$j][16] . ' ' . $aa[$j][17];
+    $comments = str_replace(',', ';', $comments);
 
     $uid = user_uid_optional_to_arg('%');
     $username = user_name($uid);
@@ -1358,6 +1433,7 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
     $lep_c3 = $aa[$j][12];
     $lep_c4m = $aa[$j][13];
     $lep_c4f = $aa[$j][14];
+    $total_lep_c4 = $lep_c4m + $lep_c4f;
     $lep_pam = $aa[$j][15];
     $lep_paf = $aa[$j][16];
     $lep_am = $aa[$j][17];
@@ -1368,6 +1444,7 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
     $cal_c3 = $aa[$j][22];
     $cal_c4m = $aa[$j][23];
     $cal_c4f = $aa[$j][24];
+    $total_cal_c4 = $cal_c4m + $cal_c4f;
     $cal_pam = $aa[$j][25];
     $cal_paf = $aa[$j][26];
     $cal_am = $aa[$j][27];
@@ -1408,7 +1485,9 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
     }
 
     $comments = $aa[$j][34];
+    $comments = str_replace(',', ';', $comments);
     $change_log = $aa[$j][35];
+    $change_log = str_replace(',', ';', $change_log);
 
     $date = db_select('bamp_trip', 't')
         ->fields('t', array('start_date'))
@@ -1438,6 +1517,7 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
           'lep_c3' => $lep_c3,
           'lep_c4m' => $lep_c4m,
           'lep_c4f' => $lep_c4f,
+          'total_lep_c4' => $total_lep_c4,
           'lep_pam' => $lep_pam,
           'lep_paf' => $lep_paf,
           'lep_am' => $lep_am,
@@ -1448,6 +1528,7 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
           'cal_c3' => $cal_c3,
           'cal_c4m' => $cal_c4m,
           'cal_c4f' => $cal_c4f,
+          'total_cal_c4' => $total_cal_c4,
           'cal_pam' => $cal_pam,
           'cal_paf' => $cal_paf,
           'cal_am' => $cal_am,
@@ -1458,6 +1539,8 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
           'cal_mot_notid' => $cal_mot_notid,
           'condition_factor' => $condition_factor,
           'comments' => $comments,
+          'group_name' => 'DFO',
+          'upload_user' => $username,
         ))
         ->execute();
   }

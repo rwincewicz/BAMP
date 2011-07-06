@@ -17,7 +17,7 @@ function bamp_search_form($form_state) {
 
   $form = array();
 
-  $content['form'] = array(
+  $form['form'] = array(
     '#markup' => '<p>This is the BAMP search menu</p>',
   );
 
