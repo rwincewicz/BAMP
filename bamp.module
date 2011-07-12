@@ -15,7 +15,7 @@ include 'bamp.search.inc';
 include 'bamp.chart.inc';
 include 'bamp.map.inc';
 include 'bamp.edit.inc';
-include 'bamp.audit.inc';
+include 'bamp.changelog.inc';
 
 function bamp_views_api() {
   return array(
@@ -28,6 +28,7 @@ function bamp_views_api() {
  */
 function bamp_menu() {
 
+//  Main form
   $items['bamp'] = array(
     'title' => 'BAMP',
     'page callback' => 'bamp_main_menu_callback',
@@ -36,7 +37,8 @@ function bamp_menu() {
     'weight' => '0',
   );
 
-  $items['bamp/Input forms'] = array(
+//  Individual input forms
+  $items['bamp/Input'] = array(
     'title' => 'Input Forms',
     'page callback' => 'bamp_input_menu_callback',
     'access callback' => 'user_access',
@@ -44,21 +46,21 @@ function bamp_menu() {
     'weight' => '1',
   );
 
-  $items['bamp/Input forms/Farm'] = array(
+  $items['bamp/Input/Farm'] = array(
     'title' => 'Farm Form',
     'page callback' => 'bamp_farm_input_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('input form'),
     );
 
-  $items['bamp/Input forms/Site'] = array(
+  $items['bamp/Input/Site'] = array(
     'title' => 'Site Form',
     'page callback' => 'bamp_site_input_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('input form'),
   );
 
-  $items['bamp/Input forms/Trip'] = array(
+  $items['bamp/Input/Trip'] = array(
     'title' => 'Trip Form',
     'page callback' => 'bamp_trip_input_menu_callback',
     'access callback' => 'user_access',
@@ -66,21 +68,22 @@ function bamp_menu() {
     'expanded' => TRUE,
   );
 
-  $items['bamp/Input forms/Lab'] = array(
+  $items['bamp/Input/Lab'] = array(
     'title' => 'Lab Form',
     'page callback' => 'bamp_lab_input_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('input form'),
   );
 
-  $items['bamp/Input forms/Results'] = array(
+  $items['bamp/Input/Field'] = array(
     'title' => 'Field results Form',
     'page callback' => 'bamp_field_input_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('input form'),
   );
 
-  $items['bamp/Upload forms'] = array(
+//  Batch upload forms
+  $items['bamp/Upload'] = array(
     'title' => 'Upload Forms',
     'page callback' => 'bamp_upload_menu_callback',
     'access callback' => 'user_access',
@@ -88,191 +91,194 @@ function bamp_menu() {
     'weight' => '2',
   );
 
-  $items['bamp/Upload forms/Crawford field results CSV upload'] = array(
+  $items['bamp/Upload/CrawfordField'] = array(
     'title' => 'Crawford field results CSV upload',
-    'page callback' => 'bampupcrawfield_menu_callback',
+    'page callback' => 'bamp_upload_crawford_field_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
 
-  $items['bamp/Upload forms/Crawford Site CSV upload'] = array(
+  $items['bamp/Upload/CrawfordSite'] = array(
     'title' => 'Crawford Site CSV upload',
-    'page callback' => 'bampupcrawsite_menu_callback',
+    'page callback' => 'bamp_upload_crawford_site_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
 
-  $items['bamp/Upload forms/Crawford Lab results CSV upload'] = array(
+  $items['bamp/Upload/CrawfordLab'] = array(
     'title' => 'Crawford lab results CSV upload',
-    'page callback' => 'bampupcrawlabr_menu_callback',
+    'page callback' => 'bamp_upload_crawford_lab_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-  $items['bamp/Upload forms/Marty field results CSV upload'] = array(
+  $items['bamp/Upload/MartyField'] = array(
     'title' => 'Marty field results CSV upload',
-    'page callback' => 'bampupmartyfield_menu_callback',
+    'page callback' => 'bamp_upload_marty_field_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-  $items['bamp/Upload forms/Marty site results CSV upload'] = array(
+  $items['bamp/Upload/MartySite'] = array(
     'title' => 'Marty site results CSV upload',
-    'page callback' => 'bampupmartysite_menu_callback',
+    'page callback' => 'bamp_upload_marty_site_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
 
-  $items['bamp/Upload forms/Weather CSV upload'] = array(
+  $items['bamp/Upload/Weather'] = array(
     'title' => 'Weather CSV upload',
-    'page callback' => 'bampupweather_menu_callback',
+    'page callback' => 'bamp_upload_weather_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-  $items['bamp/Upload forms/Environment CSV upload'] = array(
+  $items['bamp/Upload/Environment'] = array(
     'title' => 'Environment CSV upload',
-    'page callback' => 'bampupenvironment_menu_callback',
+    'page callback' => 'bamp_upload_environment_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-//  $items['bamp/Upload forms/DFO Field CSV upload'] = array(
+//  $items['bamp/Upload/DFOField'] = array(
 //    'title' => 'DFO Field CSV upload',
-//    'page callback' => 'dfo_field_csv_menu_callback',
+//    'page callback' => 'dfo_upload_field_menu_callback',
 //    'access callback' => 'user_access',
 //    'access arguments' => array('upload form'),
 //  );
   
-  $items['bamp/Upload forms/DFO Lab CSV upload'] = array(
+  $items['bamp/Upload/DFOLab'] = array(
     'title' => 'DFO Lab CSV upload',
-    'page callback' => 'dfo_lab_csv_menu_callback',
+    'page callback' => 'dfo_upload_lab_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-  $items['bamp/Upload forms/DFO Site CSV upload'] = array(
+  $items['bamp/Upload/DFOSite'] = array(
     'title' => 'DFO Site CSV upload',
-    'page callback' => 'dfo_site_csv_menu_callback',
+    'page callback' => 'dfo_upload_site_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
   
-//  $items['bamp/Upload forms/DFO Trip CSV upload'] = array(
+//  $items['bamp/Upload/DFOTrip'] = array(
 //    'title' => 'DFO Trip CSV upload',
-//    'page callback' => 'dfo_trip_csv_menu_callback',
+//    'page callback' => 'dfo_upload_trip_menu_callback',
 //    'access callback' => 'user_access',
 //    'access arguments' => array('upload form'),
 //  );
  
-  $items['bamp/Report forms'] = array(
+//  Report generation forms
+  $items['bamp/Report'] = array(
     'title' => 'Report Forms',
-    'page callback' => 'bampreport_menu_callback',
+    'page callback' => 'bamp_report_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
     'weight' => '4',
   );
   
-  $items['bamp/Report forms/Results'] = array(
+  $items['bamp/Report/Results'] = array(
     'title' => 'Combined results report',
-    'page callback' => 'bamprepres_menu_callback',
+    'page callback' => 'bamp_report_results_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
 
-  $items['bamp/Report forms/Field results'] = array(
+  $items['bamp/Report/Field'] = array(
     'title' => 'Field results report',
-    'page callback' => 'bamprepfield_menu_callback',
+    'page callback' => 'bamp_report_field_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Report forms/Lab results'] = array(
+  $items['bamp/Report/Lab'] = array(
     'title' => 'Lab results report',
-    'page callback' => 'bampreplab_menu_callback',
+    'page callback' => 'bamp_report_lab_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Report forms/Sites'] = array(
+  $items['bamp/Report/Sites'] = array(
     'title' => 'Sites report',
-    'page callback' => 'bamprepsite_menu_callback',
+    'page callback' => 'bamp_report_site_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Report forms/Environment'] = array(
+  $items['bamp/Report/Environment'] = array(
     'title' => 'Environmental report',
-    'page callback' => 'bamprepenv_menu_callback',
+    'page callback' => 'bamp_report_environment_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Report forms/Weather'] = array(
+  $items['bamp/Report/Weather'] = array(
     'title' => 'Weather report',
-    'page callback' => 'bamprepweather_menu_callback',
+    'page callback' => 'bamp_report_weather_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Report forms/Trip'] = array(
+  $items['bamp/Report/Trip'] = array(
     'title' => 'Trip report',
-    'page callback' => 'bamp_trip_report_menu_callback',
+    'page callback' => 'bamp_report_trip_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
 
-  $items['bamp/Edit forms'] = array(
+//  Entry edit forms
+  $items['bamp/Edit'] = array(
     'title' => 'Edit Forms',
-    'page callback' => 'bampedit_menu_callback',
+    'page callback' => 'bamp_edit_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
     'weight' => '5',
   );
   
-  $items['bamp/Edit forms/Individual Field results'] = array(
+  $items['bamp/Edit/Field'] = array(
     'title' => 'Field edit form',
-    'page callback' => 'bampeditfield_menu_callback',
+    'page callback' => 'bamp_edit_field_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
   
-  $items['bamp/Edit forms/Individual Lab results'] = array(
+  $items['bamp/Edit/Lab'] = array(
     'title' => 'Lab edit form',
-    'page callback' => 'bampeditlab_menu_callback',
+    'page callback' => 'bamp_edit_lab_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
   
-  $items['bamp/Edit forms/Individual Site data'] = array(
+  $items['bamp/Edit/Site'] = array(
     'title' => 'Site edit form',
-    'page callback' => 'bampeditsite_menu_callback',
+    'page callback' => 'bamp_edit_site_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
   
-  $items['bamp/Edit forms/Trip data'] = array(
+  $items['bamp/Edit/Trip'] = array(
     'title' => 'Trip edit form',
-    'page callback' => 'bamp_trip_edit_menu_callback',
+    'page callback' => 'bamp_edit_trip_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
   
-  $items['bamp/Edit forms/Weather data'] = array(
+  $items['bamp/Edit/Weather'] = array(
     'title' => 'Weather edit form',
-    'page callback' => 'bampeditweather_menu_callback',
+    'page callback' => 'bamp_edit_weather_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
   
-  $items['bamp/Edit forms/Environment data'] = array(
+  $items['bamp/Edit/Environment'] = array(
     'title' => 'Environment edit form',
-    'page callback' => 'bampeditenvironment_menu_callback',
+    'page callback' => 'bamp_edit_environment_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('edit form'),
   );
  
-  $items['bamp/Search forms'] = array(
+//  Data search forms
+  $items['bamp/Search'] = array(
     'title' => 'Search Forms',
     'page callback' => 'bamp_search_menu_callback',
     'access callback' => 'user_access',
@@ -280,13 +286,14 @@ function bamp_menu() {
     'weight' => '3',
   );
 
-  $items['bamp/Search forms/Results'] = array(
+  $items['bamp/Search/Results'] = array(
     'title' => 'Search Field Results',
     'page callback' => 'bamp_search_results_menu_callback',
     'access callback' => 'user_access',
     'access arguments' => array('report form'),
   );
  
+//  Data charting forms
   $items['bamp/Charts'] = array(
     'title' => 'Charts',
     'page callback' => 'bamp_charts_menu_callback',
@@ -309,6 +316,7 @@ function bamp_menu() {
     'access arguments' => array('report form'),
   );
 
+//  Map generation forms
   $items['bamp/Maps'] = array(
     'title' => 'Maps',
     'page callback' => 'bamp_maps_menu_callback',
@@ -324,19 +332,20 @@ function bamp_menu() {
     'access arguments' => array('report form'),
   );
   
-  $items['bamp/Audit'] = array(
-    'title' => 'Audit',
-    'page callback' => 'bamp_audit_menu_callback',
+//  Changelog forms
+  $items['bamp/Changelog'] = array(
+    'title' => 'Change log',
+    'page callback' => 'bamp_changelog_menu_callback',
     'access callback' => 'user_access',
-    'access arguments' => array('audit form'),
+    'access arguments' => array('changelog form'),
     'weight' => '8',
   );
   
-  $items['bamp/Audit/Results'] = array(
-    'title' => 'Audit results',
-    'page callback' => 'bamp_audit_results_menu_callback',
+  $items['bamp/Changelog/Results'] = array(
+    'title' => 'Change log results',
+    'page callback' => 'bamp_changelog_results_menu_callback',
     'access callback' => 'user_access',
-    'access arguments' => array('audit form'),
+    'access arguments' => array('changelog form'),
   );
   
   return $items;
@@ -377,9 +386,9 @@ function bamp_permission() {
       'title' => t('BAMP edit form access'),
       'description' => t('Access to the BAMP edit forms'),
     ),
-    'audit form' => array(
-      'title' => t('BAMP audit form access'),
-      'description' => t('Access to the BAMP audit forms'),
+    'changelog form' => array(
+      'title' => t('BAMP change log form access'),
+      'description' => t('Access to the BAMP change log forms'),
     ),
   );
 }

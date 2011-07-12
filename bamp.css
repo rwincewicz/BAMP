@@ -1,0 +1,26 @@
+/* 
+    Document   : bamp
+    Created on : Jul 6, 2011, 3:17:23 PM
+    Author     : rwincewicz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+html { 
+    height: 100%;
+}
+
+body { 
+    height: 100%; 
+    margin: 0px; 
+    padding: 0px;
+}
+
+#map_canvas { 
+    height: 100%;
+}

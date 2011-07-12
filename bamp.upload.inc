@@ -41,7 +41,7 @@ function bamp_upload_menu_callback() {
 /**
  * Create BAMP CSV upload form for Crawford data
  */
-function bampupcrawfield_form($form_state) {
+function bamp_upload_crawford_field_form($form_state) {
   drupal_set_title(t('Crawford field CSV upload form'));
 
   $form = array();
@@ -68,11 +68,11 @@ function bampupcrawfield_form($form_state) {
   return $form;
 }
 
-function bampupcrawfield_menu_callback() {
-  return drupal_get_form('bampupcrawfield_form');
+function bamp_upload_crawford_field_menu_callback() {
+  return drupal_get_form('bamp_upload_crawford_field_form');
 }
 
-function bampupcrawfield_form_validate($form, &$form_state) {
+function bamp_upload_crawford_field_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -87,12 +87,12 @@ function bampupcrawfield_form_validate($form, &$form_state) {
   }
 }
 
-function bampupcrawfield_form_submit($form, &$form_state) {
+function bamp_upload_crawford_field_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ';');
+  $aa = bamp_csv2aa($csv_file_path, ';');
 
   $na = (count($aa) - 1);
 
@@ -100,8 +100,8 @@ function bampupcrawfield_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@na' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -149,7 +149,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
     }
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_field_results')
         ->fields(array(
@@ -190,7 +190,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
@@ -200,7 +200,7 @@ function bampupcrawfield_form_submit($form, &$form_state) {
  * 
  * Create an upload form for Sites from Crawford's team
  */
-function bampupcrawsite_form($form_state) {
+function bamp_upload_crawford_site_form($form_state) {
   drupal_set_title(t('Crawford Site CSV upload form'));
 
   $form = array();
@@ -227,11 +227,11 @@ function bampupcrawsite_form($form_state) {
   return $form;
 }
 
-function bampupcrawsite_menu_callback() {
-  return drupal_get_form('bampupcrawsite_form');
+function bamp_upload_crawford_site_menu_callback() {
+  return drupal_get_form('bamp_upload_crawford_site_form');
 }
 
-function bampupcrawsite_form_validate($form, &$form_state) {
+function bamp_upload_crawford_site_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -246,15 +246,15 @@ function bampupcrawsite_form_validate($form, &$form_state) {
   }
 }
 
-function bampupcrawsite_form_submit($form, &$form_state) {
+function bamp_upload_crawford_site_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ',');
   $na = (count($aa) - 1);
 
-  drupal_set_message(t('There are ' . $na . ' sites in this file'));
+  drupal_set_message(t('There are ' . "@na" . ' sites in this file', array('@na' => $na)));
   for ($j = 1; $j <= $na; $j++) {
 
     $group = 'crawford';
@@ -265,8 +265,8 @@ function bampupcrawsite_form_submit($form, &$form_state) {
     $zone = $aa[$j][4];
     $area = $aa[$j][5];
 
-    $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $uid = user_id_optional_to_arg('%');
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_sites')
         ->fields(array(
@@ -285,7 +285,7 @@ function bampupcrawsite_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
@@ -295,7 +295,7 @@ function bampupcrawsite_form_submit($form, &$form_state) {
  * 
  * Create an upload form for Lab results from Crawford's team
  */
-function bampupcrawlabr_form($form_state) {
+function bamp_upload_crawford_lab_form($form_state) {
   drupal_set_title(t('Crawford lab report CSV upload form'));
 
   $form = array();
@@ -322,11 +322,11 @@ function bampupcrawlabr_form($form_state) {
   return $form;
 }
 
-function bampupcrawlabr_menu_callback() {
-  return drupal_get_form('bampupcrawlabr_form');
+function bamp_upload_crawford_lab_menu_callback() {
+  return drupal_get_form('bamp_upload_crawford_lab_form');
 }
 
-function bampupcrawlabr_form_validate($form, &$form_state) {
+function bamp_upload_crawford_lab_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -341,15 +341,15 @@ function bampupcrawlabr_form_validate($form, &$form_state) {
   }
 }
 
-function bampupcrawlabr_form_submit($form, &$form_state) {
+function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ';');
+  $aa = bamp_csv2aa($csv_file_path, ';');
   $na = (count($aa) - 1);
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
 
   for ($j = 1; $j <= $na; $j++) {
 
@@ -363,7 +363,6 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $lspecies = $aa[$j][7];
     $length = $aa[$j][8];
     $weight = $aa[$j][9];
-
     $lep_c0 = $aa[$j][10];
     $lep_c1 = $aa[$j][11];
     $lep_c2 = $aa[$j][12];
@@ -415,7 +414,7 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
     $change_log = str_replace(',', ';', $change_log);
     
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
     
     if ($lspecies == '') {
       $lspecies = 'Same';
@@ -460,13 +459,13 @@ function bampupcrawlabr_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for Marty data
  */
-function bampupmartyfield_form($form_state) {
+function bamp_upload_marty_field_form($form_state) {
   drupal_set_title(t('Marty field CSV upload form'));
 
   $form = array();
@@ -493,11 +492,11 @@ function bampupmartyfield_form($form_state) {
   return $form;
 }
 
-function bampupmartyfield_menu_callback() {
-  return drupal_get_form('bampupmartyfield_form');
+function bamp_upload_marty_field_menu_callback() {
+  return drupal_get_form('bamp_upload_marty_field_form');
 }
 
-function bampupmartyfield_form_validate($form, &$form_state) {
+function bamp_upload_marty_field_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -512,12 +511,12 @@ function bampupmartyfield_form_validate($form, &$form_state) {
   }
 }
 
-function bampupmartyfield_form_submit($form, &$form_state) {
+function bamp_upload_marty_field_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ',');
 
   $na = (count($aa) - 1);
 
@@ -525,8 +524,8 @@ function bampupmartyfield_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -605,7 +604,7 @@ function bampupmartyfield_form_submit($form, &$form_state) {
     }
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_field_results')
         ->fields(array(
@@ -655,10 +654,10 @@ function bampupmartyfield_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
-function bampupmartysite_form($form_state) {
+function bamp_upload_marty_site_form($form_state) {
   drupal_set_title(t('Marty site CSV upload form'));
 
   $form = array();
@@ -685,11 +684,11 @@ function bampupmartysite_form($form_state) {
   return $form;
 }
 
-function bampupmartysite_menu_callback() {
-  return drupal_get_form('bampupmartysite_form');
+function bamp_upload_marty_site_menu_callback() {
+  return drupal_get_form('bamp_upload_marty_site_form');
 }
 
-function bampupmartysite_form_validate($form, &$form_state) {
+function bamp_upload_marty_site_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -704,17 +703,17 @@ function bampupmartysite_form_validate($form, &$form_state) {
   }
 }
 
-function bampupmartysite_form_submit($form, &$form_state) {
+function bamp_upload_marty_site_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ';');
 
   $na = (count($aa) - 1);
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  
   for ($j = 1; $j <= $na; $j++) {
 
     $group = 'marty';
@@ -748,7 +747,7 @@ function bampupmartysite_form_submit($form, &$form_state) {
 //    }
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_sites')
         ->fields(array(
@@ -769,13 +768,13 @@ function bampupmartysite_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for Crawford data
  */
-function bampupweather_form($form_state) {
+function bamp_upload_weather_form($form_state) {
   drupal_set_title(t('Weather CSV upload form'));
 
   $form = array();
@@ -802,11 +801,11 @@ function bampupweather_form($form_state) {
   return $form;
 }
 
-function bampupweather_menu_callback() {
-  return drupal_get_form('bampupweather_form');
+function bamp_upload_weather_menu_callback() {
+  return drupal_get_form('bamp_upload_weather_form');
 }
 
-function bampupweather_form_validate($form, &$form_state) {
+function bamp_upload_weather_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -821,14 +820,14 @@ function bampupweather_form_validate($form, &$form_state) {
   }
 }
 
-function bampupweather_form_submit($form, &$form_state) {
+function bamp_upload_weather_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
   $site = explode('_', $csv_file_name);
 
-  $aa = csv2aa($csv_file_path, ' ');
+  $aa = bamp_csv2aa($csv_file_path, ' ');
 
   $na = (count($aa) - 1);
 
@@ -836,8 +835,8 @@ function bampupweather_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -857,7 +856,7 @@ function bampupweather_form_submit($form, &$form_state) {
     $ia = str_replace("---", " 00.0", $ia);
     $ia = str_replace("--", " 00.0", $ia);
     $ia = preg_replace('/\s+/', ' ', $ia);
-    drupal_set_message($ia);
+    drupal_set_message(t($ia, array('@ia' => $ia)));
     $ea = explode(' ', $ia);
 
     $site_name = $site[0];
@@ -891,20 +890,20 @@ function bampupweather_form_submit($form, &$form_state) {
     }
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
 //    drupal_set_message('Date: ' . $date); 
-    drupal_set_message(t('Time: ' . $time));
-    drupal_set_message(t('Temp: ' . $temp));
-    drupal_set_message(t('Site ID: ' . $site_id));
-    drupal_set_message(t('Hi temp: ' . $temp_hi));
-    drupal_set_message(t('Low temp: ' . $temp_low));
-    drupal_set_message(t('Humidity: ' . $hum));
-    drupal_set_message(t('Dew point: ' . $dew_pt));
-    drupal_set_message(t('Wind speed: ' . $wind_speed));
-    drupal_set_message(t('Wind high: ' . $wind_hi));
+//    drupal_set_message(t('Time: ' . $time));
+//    drupal_set_message(t('Temp: ' . $temp));
+//    drupal_set_message(t('Site ID: ' . $site_id));
+//    drupal_set_message(t('Hi temp: ' . $temp_hi));
+//    drupal_set_message(t('Low temp: ' . $temp_low));
+//    drupal_set_message(t('Humidity: ' . $hum));
+//    drupal_set_message(t('Dew point: ' . $dew_pt));
+//    drupal_set_message(t('Wind speed: ' . $wind_speed));
+//    drupal_set_message(t('Wind high: ' . $wind_hi));
 //    drupal_set_message('Wind dir: ' . $wind_dir);
-    drupal_set_message(t('Rain: ' . $rain));
+//    drupal_set_message(t('Rain: ' . $rain));
 //    drupal_set_message('Bar: ' . $bar);
 //    drupal_set_message('Arc int: ' . $arc_int);
 //    drupal_set_message('Wind dir deg: ' . $wind_dir_deg);
@@ -931,13 +930,13 @@ function bampupweather_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for Crawford data
  */
-function bampupenvironment_form($form_state) {
+function bamp_upload_environment_form($form_state) {
   drupal_set_title(t('Environment CSV upload form'));
 
   $form = array();
@@ -964,11 +963,11 @@ function bampupenvironment_form($form_state) {
   return $form;
 }
 
-function bampupenvironment_menu_callback() {
-  return drupal_get_form('bampupenvironment_form');
+function bamp_upload_environment_menu_callback() {
+  return drupal_get_form('bamp_upload_environment_form');
 }
 
-function bampupenvironment_form_validate($form, &$form_state) {
+function bamp_upload_environment_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -983,12 +982,12 @@ function bampupenvironment_form_validate($form, &$form_state) {
   }
 }
 
-function bampupenvironment_form_submit($form, &$form_state) {
+function bamp_upload_environment_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ';');
+  $aa = bamp_csv2aa($csv_file_path, ';');
 
   $na = (count($aa) - 2);
 
@@ -996,8 +995,8 @@ function bampupenvironment_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 3; $j <= $nu; $j++) {
 
@@ -1016,7 +1015,7 @@ function bampupenvironment_form_submit($form, &$form_state) {
     $depth_1 = '1';
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_environment')
         ->fields(array(
@@ -1082,14 +1081,14 @@ function bampupenvironment_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for DFO field data
  * This may not be necessary either because the data only relates to fish caught, not lice levels
  */
-function dfo_field_csv_form($form_state) {
+function dfo_upload_field_form($form_state) {
   drupal_set_title(t('DFO field CSV upload form'));
 
   $form = array();
@@ -1116,11 +1115,11 @@ function dfo_field_csv_form($form_state) {
   return $form;
 }
 
-function dfo_field_csv_menu_callback() {
-  return drupal_get_form('dfo_field_csv_form');
+function dfo_upload_field_menu_callback() {
+  return drupal_get_form('dfo_upload_field_form');
 }
 
-function dfo_field_csv_form_validate($form, &$form_state) {
+function dfo_upload_field_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -1135,12 +1134,12 @@ function dfo_field_csv_form_validate($form, &$form_state) {
   }
 }
 
-function dfo_field_csv_form_submit($form, &$form_state) {
+function dfo_upload_field_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ',');
 
   $na = (count($aa) - 1);
 
@@ -1148,8 +1147,8 @@ function dfo_field_csv_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -1163,7 +1162,7 @@ function dfo_field_csv_form_submit($form, &$form_state) {
     $change_log = str_replace(',', ';', $change_log);
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_field_results')
         ->fields(array(
@@ -1178,13 +1177,13 @@ function dfo_field_csv_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for DFO site data
  */
-function dfo_site_csv_form($form_state) {
+function dfo_upload_site_form($form_state) {
   drupal_set_title(t('DFO site CSV upload form'));
 
   $form = array();
@@ -1211,11 +1210,11 @@ function dfo_site_csv_form($form_state) {
   return $form;
 }
 
-function dfo_site_csv_menu_callback() {
-  return drupal_get_form('dfo_site_csv_form');
+function dfo_upload_site_menu_callback() {
+  return drupal_get_form('dfo_upload_site_form');
 }
 
-function dfo_site_csv_form_validate($form, &$form_state) {
+function dfo_upload_site_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -1230,12 +1229,12 @@ function dfo_site_csv_form_validate($form, &$form_state) {
   }
 }
 
-function dfo_site_csv_form_submit($form, &$form_state) {
+function dfo_upload_site_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ',');
 
   $na = (count($aa) - 1);
 
@@ -1243,8 +1242,8 @@ function dfo_site_csv_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -1270,7 +1269,7 @@ function dfo_site_csv_form_submit($form, &$form_state) {
     $comments = str_replace(',', ';', $comments);
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     if ($salinity == "") {
       $salinity = NULL;
@@ -1325,13 +1324,13 @@ function dfo_site_csv_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for DFO lab data
  */
-function dfo_lab_csv_form($form_state) {
+function dfo_upload_lab_form($form_state) {
   drupal_set_title(t('DFO lab CSV upload form'));
 
   $form = array();
@@ -1358,11 +1357,11 @@ function dfo_lab_csv_form($form_state) {
   return $form;
 }
 
-function dfo_lab_csv_menu_callback() {
-  return drupal_get_form('dfo_lab_csv_form');
+function dfo_upload_lab_menu_callback() {
+  return drupal_get_form('dfo_upload_lab_form');
 }
 
-function dfo_lab_csv_form_validate($form, &$form_state) {
+function dfo_upload_lab_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -1377,12 +1376,12 @@ function dfo_lab_csv_form_validate($form, &$form_state) {
   }
 }
 
-function dfo_lab_csv_form_submit($form, &$form_state) {
+function dfo_upload_lab_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ',');
+  $aa = bamp_csv2aa($csv_file_path, ',');
 
   $na = (count($aa) - 1);
 
@@ -1390,8 +1389,8 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@nu' => $nu)));
 
   for ($j = 1; $j <= $nu; $j++) {
 
@@ -1498,7 +1497,7 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
     $fish_id = $set_id . '-' . (int) $fish_no;
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_lab_results')
         ->fields(array(
@@ -1545,14 +1544,14 @@ function dfo_lab_csv_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 
 /**
  * Create BAMP CSV upload form for DFO trip data
  * May not be necessary as this data comes in with the site data
  */
-function dfo_trip_csv_form($form_state) {
+function dfo_upload_trip_form($form_state) {
   drupal_set_title(t('DFO trip CSV upload form'));
 
   $form = array();
@@ -1579,11 +1578,11 @@ function dfo_trip_csv_form($form_state) {
   return $form;
 }
 
-function dfo_trip_csv_menu_callback() {
-  return drupal_get_form('dfo_trip_csv_form');
+function dfo_upload_trip_menu_callback() {
+  return drupal_get_form('dfo_upload_trip_form');
 }
 
-function dfo_trip_csv_form_validate($form, &$form_state) {
+function dfo_upload_trip_form_validate($form, &$form_state) {
 
   $validators = array('file_validate_extensions' => array('csv'));
   $file = file_save_upload('csv', $validators);
@@ -1598,12 +1597,12 @@ function dfo_trip_csv_form_validate($form, &$form_state) {
   }
 }
 
-function dfo_trip_csv_form_submit($form, &$form_state) {
+function dfo_upload_trip_form_submit($form, &$form_state) {
 
   $csv_file_path = $form_state['values']['csv']['filepath'];
   $csv_file_name = $form_state['values']['csv']['title'];
 
-  $aa = csv2aa($csv_file_path, ';');
+  $aa = bamp_csv2aa($csv_file_path, ';');
 
   $na = (count($aa) - 2);
 
@@ -1611,8 +1610,8 @@ function dfo_trip_csv_form_submit($form, &$form_state) {
 
   $nu = $na;
 
-  drupal_set_message(t('There are ' . $na . ' entries in this file'));
-  drupal_set_message(t($nu . ' of these entries were uploaded'));
+  drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
+  drupal_set_message(t("@nu" . ' of these entries were uploaded', array('@na' => $na)));
 
   for ($j = 3; $j <= $nu; $j++) {
 
@@ -1631,7 +1630,7 @@ function dfo_trip_csv_form_submit($form, &$form_state) {
     $depth_1 = '1';
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $sample = db_insert('bamp_environment')
         ->fields(array(
@@ -1697,5 +1696,5 @@ function dfo_trip_csv_form_submit($form, &$form_state) {
         ->execute();
   }
 
-  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
+  drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }

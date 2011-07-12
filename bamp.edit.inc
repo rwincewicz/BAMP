@@ -11,7 +11,7 @@ include 'bamp.helper.inc';
 /**
  * Create BAMP edit menu
  */
-function bampedit_form($form_state) {
+function bamp_edit_form($form_state) {
   drupal_set_title(t('Edit menu'));
 
   $form = array();
@@ -23,11 +23,11 @@ function bampedit_form($form_state) {
   return $form;
 }
 
-function bampedit_menu_callback() {
-  return drupal_get_form('bampedit_form');
+function bamp_edit_menu_callback() {
+  return drupal_get_form('bamp_edit_form');
 }
 
-function bampeditfield_form($form, &$form_state, $id) {
+function bamp_edit_field_form($form, &$form_state, $id) {
   drupal_set_title(t('Field results edit form'));
 
   drupal_get_messages('warning');
@@ -661,31 +661,31 @@ function bampeditfield_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bampeditfield_menu_callback($id=NULL) {
-  return drupal_get_form('bampeditfield_form', $id);
+function bamp_edit_field_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_field_form', $id);
 }
 
-function bampeditfield_form_submit($form, &$form_state) {
+function bamp_edit_field_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
+    drupal_goto('bamp/Edit/Field/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
+    drupal_goto('bamp/Edit/Field/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
+    drupal_goto('bamp/Edit/Field/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
+    drupal_goto('bamp/Edit/Field/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -757,7 +757,7 @@ function bampeditfield_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_field_results')
         ->fields(array(
@@ -831,7 +831,7 @@ function bampeditfield_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Individual Field results/' . $id);
+    drupal_goto('bamp/Edit/Field/' . $id);
   }
 }
 
@@ -842,7 +842,7 @@ function bampeditfield_form_submit($form, &$form_state) {
  * @param type $id
  * @return string 
  */
-function bampeditsite_form($form, &$form_state, $id) {
+function bamp_edit_site_form($form, &$form_state, $id) {
   drupal_set_title(t('Site data edit form'));
 
   drupal_get_messages('warning');
@@ -1089,31 +1089,31 @@ function bampeditsite_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bampeditsite_menu_callback($id=NULL) {
-  return drupal_get_form('bampeditsite_form', $id);
+function bamp_edit_site_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_site_form', $id);
 }
 
-function bampeditsite_form_submit($form, &$form_state) {
+function bamp_edit_site_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
+    drupal_goto('bamp/Edit/Site/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
+    drupal_goto('bamp/Edit/Site/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
+    drupal_goto('bamp/Edit/Site/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
+    drupal_goto('bamp/Edit/Site/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -1144,7 +1144,7 @@ function bampeditsite_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_sites')
         ->fields(array(
@@ -1177,7 +1177,7 @@ function bampeditsite_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Individual Site data/' . $id);
+    drupal_goto('bamp/Edit/Site/' . $id);
   }
 }
 
@@ -1188,7 +1188,7 @@ function bampeditsite_form_submit($form, &$form_state) {
  * @param type $id
  * @return string 
  */
-function bampeditweather_form($form, &$form_state, $id) {
+function bamp_edit_weather_form($form, &$form_state, $id) {
   drupal_set_title(t('Weather data edit form'));
 
   drupal_get_messages('warning');
@@ -1394,7 +1394,6 @@ function bampeditweather_form($form, &$form_state, $id) {
     '#default_value' => $rain,
   );
 
-
   $form['form']['bar'] = array(
     '#type' => 'textfield',
     '#title' => t('Pressure (bar)'),
@@ -1435,31 +1434,31 @@ function bampeditweather_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bampeditweather_menu_callback($id=NULL) {
-  return drupal_get_form('bampeditweather_form', $id);
+function bamp_edit_weather_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_weather_form', $id);
 }
 
-function bampeditweather_form_submit($form, &$form_state) {
+function bamp_edit_weather_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Weather data/' . $id);
+    drupal_goto('bamp/Edit/Weather/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Weather data/' . $id);
+    drupal_goto('bamp/Edit/Weather/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Weather data/' . $id);
+    drupal_goto('bamp/Edit/Weather/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Weather data/' . $id);
+    drupal_goto('bamp/Edit/Weather/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -1490,7 +1489,7 @@ function bampeditweather_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_weather')
         ->fields(array(
@@ -1523,7 +1522,7 @@ function bampeditweather_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Weather data/' . $id);
+    drupal_goto('bamp/Edit/Weather/' . $id);
   }
 }
 
@@ -1534,7 +1533,7 @@ function bampeditweather_form_submit($form, &$form_state) {
  * @param type $id
  * @return string 
  */
-function bampeditenvironment_form($form, &$form_state, $id) {
+function bamp_edit_environment_form($form, &$form_state, $id) {
   drupal_set_title(t('Environment data edit form'));
 
   drupal_get_messages('warning');
@@ -1708,31 +1707,31 @@ function bampeditenvironment_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bampeditenvironment_menu_callback($id=NULL) {
-  return drupal_get_form('bampeditenvironment_form', $id);
+function bamp_edit_environment_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_environment_form', $id);
 }
 
-function bampeditenvironment_form_submit($form, &$form_state) {
+function bamp_edit_environment_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+    drupal_goto('bamp/Edit/Environment/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+    drupal_goto('bamp/Edit/Environment/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+    drupal_goto('bamp/Edit/Environment/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+    drupal_goto('bamp/Edit/Environment/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -1754,7 +1753,7 @@ function bampeditenvironment_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_environment')
         ->fields(array(
@@ -1778,7 +1777,7 @@ function bampeditenvironment_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Environment data/' . $id);
+    drupal_goto('bamp/Edit/Environment/' . $id);
   }
 }
 
@@ -1789,7 +1788,7 @@ function bampeditenvironment_form_submit($form, &$form_state) {
  * @param type $id
  * @return string 
  */
-function bampeditlab_form($form, &$form_state, $id) {
+function bamp_edit_lab_form($form, &$form_state, $id) {
   drupal_set_title(t('Lab results edit form'));
 
   drupal_get_messages('warning');
@@ -1944,31 +1943,31 @@ function bampeditlab_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bampeditlab_menu_callback($id=NULL) {
-  return drupal_get_form('bampeditlab_form', $id);
+function bamp_edit_lab_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_lab_form', $id);
 }
 
-function bampeditlab_form_submit($form, &$form_state) {
+function bamp_edit_lab_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+    drupal_goto('bamp/Edit/Lab/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+    drupal_goto('bamp/Edit/Lab/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+    drupal_goto('bamp/Edit/Lab/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+    drupal_goto('bamp/Edit/Lab/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -2022,7 +2021,7 @@ function bampeditlab_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_lab_results')
         ->fields(array(
@@ -2078,7 +2077,7 @@ function bampeditlab_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Individual Lab results/' . $id);
+    drupal_goto('bamp/Edit/Lab/' . $id);
   }
 }
 
@@ -2089,7 +2088,7 @@ function bampeditlab_form_submit($form, &$form_state) {
  * @param type $id
  * @return string 
  */
-function bamp_trip_edit_form($form, &$form_state, $id) {
+function bamp_edit_trip_form($form, &$form_state, $id) {
   drupal_set_title(t('Trip data edit form'));
 
   drupal_get_messages('warning');
@@ -2271,31 +2270,31 @@ function bamp_trip_edit_form($form, &$form_state, $id) {
   return $form;
 }
 
-function bamp_trip_edit_menu_callback($id=NULL) {
-  return drupal_get_form('bamp_trip_edit_form', $id);
+function bamp_edit_trip_menu_callback($id=NULL) {
+  return drupal_get_form('bamp_edit_trip_form', $id);
 }
 
-function bamp_trip_edit_form_submit($form, &$form_state) {
+function bamp_edit_trip_form_submit($form, &$form_state) {
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
-    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+    drupal_goto('bamp/Edit/Trip/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
-    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+    drupal_goto('bamp/Edit/Trip/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
-    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+    drupal_goto('bamp/Edit/Trip/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
-    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+    drupal_goto('bamp/Edit/Trip/' . $id);
   }
 
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
@@ -2318,7 +2317,7 @@ function bamp_trip_edit_form_submit($form, &$form_state) {
     $old_values = $form_state['values']['old_values'];
 
     $uid = user_uid_optional_to_arg('%');
-    $username = user_name($uid);
+    $username = bamp_user_name($uid);
 
     $entry_update = db_update('bamp_trip')
         ->fields(array(
@@ -2343,6 +2342,6 @@ function bamp_trip_edit_form_submit($form, &$form_state) {
         ->execute();
 
     drupal_set_message(t('Entry edited successfully!'));
-    drupal_goto('bamp/Edit forms/Trip data/' . $id);
+    drupal_goto('bamp/Edit/Trip/' . $id);
   }
 }

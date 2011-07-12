@@ -42,7 +42,7 @@ function bamp_charts1_form($form, &$form_state) {
     '#title' => t('Search details'),
   );
 
-  $species_array = db_list('bamp_field_results', 'species');
+  $species_array = bamp_db_list('bamp_field_results', 'species');
 
   $species_array[0] = 'all';
 
@@ -53,7 +53,7 @@ function bamp_charts1_form($form, &$form_state) {
     '#default_value' => 0,
   );
 
-  $trip_array = db_list('bamp_field_results', 'trip_id');
+  $trip_array = bamp_db_list('bamp_field_results', 'trip_id');
 
   $trip_array[0] = 'all';
 
@@ -64,7 +64,7 @@ function bamp_charts1_form($form, &$form_state) {
     '#default_value' => 0,
   );
 
-  $site_array = db_list('bamp_field_results', 'site_name');
+  $site_array = bamp_db_list('bamp_field_results', 'site_name');
 
   $site_array[0] = 'all';
 
@@ -75,7 +75,7 @@ function bamp_charts1_form($form, &$form_state) {
     '#default_value' => 0,
   );
 
-  $date_array = db_list('bamp_field_results', 'date');
+  $date_array = bamp_db_list('bamp_field_results', 'date');
 
   $date_array[0] = 'all';
 
@@ -199,7 +199,7 @@ if ($species == "") {
   $select->addField('f', 'total_lice');
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
   
-  $entriesi = r_implode(',', ',', $entries);
+  $entriesi = bamp_r_implode(',', ',', $entries);
   $entriese = explode(',', $entriesi);
   
 //  Code to set up the variables for the chart
@@ -217,8 +217,8 @@ if ($species == "") {
     $chart_width = 700;
   }
   
-  drupal_set_message(t($no_entries . ' results returned'));
-//  drupal_set_message($entriesi);
+  drupal_set_message(t("@no_entries" . ' results returned', array('@no_entries' => $no_entries)));
+
   
   $bar = new bar();
   $bar->set_values($entriese);

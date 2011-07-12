@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+<script type="text/javascript"
+    src="http://maps.google.com/maps/api/js?sensor=false">
+</script>
+<script type="text/javascript">
+  function initialize() {
+    var site1 = new google.maps.LatLng(50.60522917, -126.63505417);
+    var site2 = new google.maps.LatLng(50.64912500, -126.62053750);
+    var site3 = new google.maps.LatLng(50.62006667, -126.70132500);
+    var site4 = new google.maps.LatLng(50.63852500, -126.49401667);
+    var myOptions = {
+      zoom: 11,
+      center: site1,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("map_canvas"),
+        myOptions);
+        
+    var marker1 = new google.maps.Marker({
+    map:map,
+    draggable:true,
+    animation: google.maps.Animation.DROP,
+    position: site1,
+    title: "Larsen Island Fish Farm"
+    });
+    
+    var marker2 = new google.maps.Marker({
+    map:map,
+    draggable:true,
+    animation: google.maps.Animation.DROP,
+    position: site2,
+    title: "Midsummer Island Fish Farm"
+    });
+    
+    var marker3 = new google.maps.Marker({
+    map:map,
+    draggable:true,
+    animation: google.maps.Animation.DROP,
+    position: site3,
+    title: "Swanson Island Fish Farm"
+    });
+    
+    var marker4 = new google.maps.Marker({
+    map:map,
+    draggable:true,
+    animation: google.maps.Animation.DROP,
+    position: site4,
+    title: "Chop Bay (1 site E of)"
+  });
+  }
+
+</script>
+</head>
+<body onload="initialize()">
+  <div id="map_canvas" style="width:100%; height:100%"></div>
+</body>
+</html>

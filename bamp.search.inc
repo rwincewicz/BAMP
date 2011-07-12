@@ -45,7 +45,7 @@ function bamp_search_results_form($form, &$form_state) {
     '#title' => t('Search details'),
   );
   
-  $species_array = db_list('bamp_field_results', 'species'); 
+  $species_array = bamp_db_list('bamp_field_results', 'species'); 
   
   $species_array[0] = 'all';
   
@@ -56,7 +56,7 @@ function bamp_search_results_form($form, &$form_state) {
     '#default_value' => 0,
   );
 
-  $trip_array = db_list('bamp_field_results', 'trip_id');
+  $trip_array = bamp_db_list('bamp_field_results', 'trip_id');
   
   $trip_array[0] = 'all';
   
@@ -67,7 +67,7 @@ function bamp_search_results_form($form, &$form_state) {
     '#default_value' => 0,
   );
 
-  $site_array = db_list('bamp_field_results', 'site_name');
+  $site_array = bamp_db_list('bamp_field_results', 'site_name');
   
   $site_array[0] = 'all';
   
@@ -152,5 +152,5 @@ function bamp_search_results_form_submit($form, &$form_state) {
     $data = 'n';
   }
   
-  drupal_goto('bamp/Report forms/Field results/' . $species . '/' . $trip . '/' . $site . '/' . $no_results . '/' . $data);
+  drupal_goto('bamp/Report/Field/' . $species . '/' . $trip . '/' . $site . '/' . $no_results . '/' . $data);
 }

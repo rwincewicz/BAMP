@@ -39,7 +39,7 @@ function bamp_farm_input_form($form_state) {
   );
 
   $form['form']['fid'] = array(
-    '#markup' => '<p><h4><b> Farm id: ' . next_id_bamp('bamp_farm') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Farm id: ' . bamp_next_id('bamp_farm') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -103,7 +103,7 @@ function bamp_site_input_form($form_state) {
   );
 
   $form['form']['siid'] = array(
-    '#markup' => '<p><h4><b> Site id: ' . next_id_bamp('bamp_sites') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Site id: ' . bamp_next_id('bamp_sites') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -198,7 +198,7 @@ function bamp_trip_input_form($form_state) {
   );
 
   $form['form']['tid'] = array(
-    '#markup' => '<p><h4><b> Trip id: ' . next_id_bamp('bamp_trip') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Trip id: ' . bamp_next_id('bamp_trip') . '</b></h4></p>',
   );
 
   $form['form']['sid'] = array(
@@ -250,7 +250,7 @@ function bamp_lab_input_form($form_state) {
   );
 
   $form['form']['lid'] = array(
-    '#markup' => '<p><h4><b> Lab id: ' . next_id_bamp('bamp_lab') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Lab id: ' . bamp_next_id('bamp_lab') . '</b></h4></p>',
   );
 
   $form['form']['name'] = array(
@@ -291,7 +291,7 @@ function bamp_field_input_form($form_state) {
   );
 
   $form['form']['rid'] = array(
-    '#markup' => '<p><h4><b> Result id: ' . next_id_bamp('bamp_field_results') . '</b></h4></p>',
+    '#markup' => '<p><h4><b> Result id: ' . bamp_next_id('bamp_field_results') . '</b></h4></p>',
   );
 
   $form['form']['sid'] = array(

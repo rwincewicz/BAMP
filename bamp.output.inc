@@ -10,7 +10,7 @@
 /**
  * Create BAMP report menu
  */
-function bampreport_form($form_state) {
+function bamp_report_form($form_state) {
   drupal_set_title(t('Report menu'));
 
   $form = array();
@@ -22,8 +22,8 @@ function bampreport_form($form_state) {
   return $form;
 }
 
-function bampreport_menu_callback() {
-  return drupal_get_form('bampreport_form');
+function bamp_report_menu_callback() {
+  return drupal_get_form('bamp_report_form');
 }
 
 /**
@@ -36,13 +36,12 @@ function bampreport_menu_callback() {
  * @param type $no_results
  * @return string 
  */
-
-function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
+function bamp_report_results_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results) {
   drupal_set_title(t('Combined results report form'));
 
   // Values can be passed in the URL to narrow the search
   // If the value isn't passed then all the results are returned
-  
+
   if ($species_id == NULL) {
     $species_message = 'Species: All<br />';
   }
@@ -115,14 +114,14 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
 
 //  Add a message into the fieldset indicating the number of results returned
   if ($no_results == 'all') {
-    $list_no = next_id_bamp('bamp_field_results');
+    $list_no = bamp_next_id('bamp_field_results');
     $no_message = 'Showing all results</br>';
-  } 
+  }
   else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
   }
-  
+
 //  Start the DB query specifying a sort of the table output and using the pager functionality. 
 //  Limit the number of results per page to $list_no
   $select = db_select('bamp_field_results', 'f')
@@ -160,13 +159,13 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
-  
+
 //  Create a 'download CSV' button to allow the results of the query to be exported
   $form['form']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Download CSV')
-    );
-  
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
+
 //  Add the relevant fields into the query and execute it
   $select->leftJoin('bamp_lab_results', 'l', 'f.fish_id = l.fish_id');
   $select->addField('f', 'id');
@@ -210,7 +209,7 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
     if ($no_results == 'all') {
       $no_results = count($rows);
     }
-    
+
     $sum_weight = bamp_sum('weight', $rows);
 
     $ave_weight = round($sum_weight / $no_results, 2);
@@ -224,7 +223,6 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
 //    $ave_chalimus = round($sum_chalimus / $no_results, 2);
 //
 //    $sum_caligus = bamp_sum('caligus', $rows);
-
 //    $ave_caligus = round($sum_caligus / $no_results, 2);
 
     $sum_total_lice = bamp_sum('total_lice', $rows);
@@ -267,22 +265,21 @@ function bamprepres_form($form, &$form_state, $species_id, $trip_id, $site_id, $
       '#theme' => 'pager',
       '#quantity' => 10,
     );
-    
   }
-  
-$result = prep_for_csv($header, $rows);
-  
+
+  $result = bamp_prep_for_csv($header, $rows);
+
 //  Pass the data as a hidden variable in the form_state array
   $form['data'] = array(
     '#type' => 'hidden',
     '#value' => $result,
   );
-  
+
   return $form;
 }
 
-function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20) {
-  return drupal_get_form('bamprepres_form', $species_id, $trip_id, $site_id, $no_results);
+function bamp_report_results_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20) {
+  return drupal_get_form('bamp_report_results_form', $species_id, $trip_id, $site_id, $no_results);
 }
 
 /**
@@ -290,24 +287,24 @@ function bamprepres_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL
  * @param type $form
  * @param type $form_state 
  */
-function bamprepres_form_submit($form, &$form_state) {
-  
-$result = $form_state['values']['data'];
+function bamp_report_results_form_submit($form, &$form_state) {
 
-$filename = 'data.csv';
+  $result = $form_state['values']['data'];
 
-drupal_add_http_header('Content-Type', 'text/csv');
-drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
-  
-print($result) . "\r\n";
- 
+  $filename = 'data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
   exit;
-
 }
+
 /**
  * Report for sites
  */
-function bamprepsite_form($form, &$form_state) {
+function bamp_report_site_form($form, &$form_state) {
   drupal_set_title(t('Site report form'));
 
   // Check if there is sorting request
@@ -392,9 +389,9 @@ function bamprepsite_form($form, &$form_state) {
 //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Site data/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Site/' . $id);
   }
-  
+
 //  Create table
   $form['Form'] = array(
     '#theme' => 'table',
@@ -408,19 +405,19 @@ function bamprepsite_form($form, &$form_state) {
     '#quantity' => 10,
   );
 
-  $result = prep_for_csv($header, $rows);
-  
+  $result = bamp_prep_for_csv($header, $rows);
+
 //  Pass the data as a hidden variable in the form_state array
   $form['data'] = array(
     '#type' => 'hidden',
     '#value' => $result,
   );
-  
+
   return $form;
 }
 
-function bamprepsite_menu_callback() {
-  return drupal_get_form('bamprepsite_form');
+function bamp_report_site_menu_callback() {
+  return drupal_get_form('bamp_report_site_form');
 }
 
 /**
@@ -433,7 +430,7 @@ function bamprepsite_menu_callback() {
  * @param type $no_results
  * @return string 
  */
-function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results, $data) {
+function bamp_report_field_form($form, &$form_state, $species_id, $trip_id, $site_id, $no_results, $data) {
   drupal_set_title(t('Field results report form'));
 
 //  Identify is an argument is present or not and if so create a message for the search details
@@ -510,65 +507,65 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     t('Height/mm'),
     t('Length/mm'),
     t('Weight'));
-  
+
   if ($data == 'y') {
     $header = array(
-       array('data' => t('Result ID'), 'field' => 'id'),
-    array('data' => t('Fish ID'), 'field' => 'fish_id'),
-    t('Trip ID'),
-    t('Sample ID'),
-    t('Site name'),
-    t('Site number'),
-    t('Set number'),
-    t('Blind number'),
-    t('To Lab'),
-    t('Date'),
-    t('Pen'),
-    t('Input name'),
-    t('Route'),
-    t('Repetition number'),
-    t('Number of fish sampled'),
-    t('Crew'),
-    t('Species'),
-    t('Height/mm'),
-    t('Length/mm'),
-    t('Weight'),
-    t('Lep copepods'),
-    t('Cal copepods'),
-    t('Total copepods'),
-    t('Chalimus a'),
-    t('Chalimus b'),
-    t('Total chalimus'),
-    t('Lep pre-adult male'),
-    t('Lep pre-adult female'),
-    t('Lep pre-adult unidentified'),
-    t('Total lep pre-adult'),
-    t('Lep adult male'),
-    t('Lep adult female'),
-    t('Lep adult gravid'),
-    t('Lep adult unidentified'),
-    t('Total lep adult'),
-    t('Total lep'),
-    t('Caligus pre-adult male'),
-    t('Caligus pre-adult female'),
-    t('Caligus pre-adult unidentified'),
-    t('Total caligus pre-adult'),
-    t('Caligus adult male'),
-    t('Caligus adult female'),
-    t('Caligus adult gravid'),
-    t('Caligus adult unidentified'),
-    t('Total caligus adult'),
-    t('Total caligus'),
-    t('Total motile'),
-    t('Total lice'),
-    t('Scar - chalimus'),
-    t('Scar - motile'),
-    t('Predation marks'),
-    t('Hemorrhaging'),
-    t('Mate guarding'),
-    t('Pinched belly'),
-    t('Tissue damage'),
-    t('Comments'));
+      array('data' => t('Result ID'), 'field' => 'id'),
+      array('data' => t('Fish ID'), 'field' => 'fish_id'),
+      t('Trip ID'),
+      t('Sample ID'),
+      t('Site name'),
+      t('Site number'),
+      t('Set number'),
+      t('Blind number'),
+      t('To Lab'),
+      t('Date'),
+      t('Pen'),
+      t('Input name'),
+      t('Route'),
+      t('Repetition number'),
+      t('Number of fish sampled'),
+      t('Crew'),
+      t('Species'),
+      t('Height/mm'),
+      t('Length/mm'),
+      t('Weight'),
+      t('Lep copepods'),
+      t('Cal copepods'),
+      t('Total copepods'),
+      t('Chalimus a'),
+      t('Chalimus b'),
+      t('Total chalimus'),
+      t('Lep pre-adult male'),
+      t('Lep pre-adult female'),
+      t('Lep pre-adult unidentified'),
+      t('Total lep pre-adult'),
+      t('Lep adult male'),
+      t('Lep adult female'),
+      t('Lep adult gravid'),
+      t('Lep adult unidentified'),
+      t('Total lep adult'),
+      t('Total lep'),
+      t('Caligus pre-adult male'),
+      t('Caligus pre-adult female'),
+      t('Caligus pre-adult unidentified'),
+      t('Total caligus pre-adult'),
+      t('Caligus adult male'),
+      t('Caligus adult female'),
+      t('Caligus adult gravid'),
+      t('Caligus adult unidentified'),
+      t('Total caligus adult'),
+      t('Total caligus'),
+      t('Total motile'),
+      t('Total lice'),
+      t('Scar - chalimus'),
+      t('Scar - motile'),
+      t('Predation marks'),
+      t('Hemorrhaging'),
+      t('Mate guarding'),
+      t('Pinched belly'),
+      t('Tissue damage'),
+      t('Comments'));
   }
 
 //  Fieldset to hold the HTML details about the search
@@ -576,12 +573,12 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     '#type' => 'fieldset',
     '#title' => t('Search details'),
   );
-  
+
 //  Check if the search returns any results and display a relevant message
   if ($no_results == 'all') {
-    $list_no = next_id_bamp('bamp_field_results');
+    $list_no = bamp_next_id('bamp_field_results');
     $no_message = 'Showing all results</br>';
-  } 
+  }
   else {
     $list_no = $no_results;
     $no_message = 'Showing ' . $no_results . ' results per page </br>';
@@ -640,46 +637,46 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
   $select->addField('f', 'height');
   $select->addField('f', 'length');
   $select->addField('f', 'weight');
-  
+
   if ($data == 'y') {
-  $select->addField('f', 'cop_lep');
-  $select->addField('f', 'cop_cal');
-  $select->addField('f', 'total_cop');
-  $select->addField('f', 'chal_a');
-  $select->addField('f', 'chal_b');
-  $select->addField('f', 'total_chal');
-  $select->addField('f', 'lep_pre_male');
-  $select->addField('f', 'lep_pre_female');
-  $select->addField('f', 'lep_pre_unid');
-  $select->addField('f', 'total_lep_pre');
-  $select->addField('f', 'lep_adult_male');
-  $select->addField('f', 'lep_adult_female');
-  $select->addField('f', 'lep_gravid');
-  $select->addField('f', 'lep_adult_unid');
-  $select->addField('f', 'total_lep_adult');
-  $select->addField('f', 'total_lep');
-  $select->addField('f', 'cal_pre_male');
-  $select->addField('f', 'cal_pre_female');
-  $select->addField('f', 'cal_pre_unid');
-  $select->addField('f', 'total_cal_pre');
-  $select->addField('f', 'cal_adult_male');
-  $select->addField('f', 'cal_adult_female');
-  $select->addField('f', 'cal_gravid');
-  $select->addField('f', 'cal_adult_unid');
-  $select->addField('f', 'total_cal_adult');
-  $select->addField('f', 'total_cal');
-  $select->addField('f', 'total_motile');
-  $select->addField('f', 'total_lice');
-  $select->addField('f', 'scar_chal');
-  $select->addField('f', 'scar_mob');
-  $select->addField('f', 'pred_mark');
-  $select->addField('f', 'hem');
-  $select->addField('f', 'mate_guard');
-  $select->addField('f', 'pin_belly');
-  $select->addField('f', 'tissue_damage');
-  $select->addField('f', 'comments');
+    $select->addField('f', 'cop_lep');
+    $select->addField('f', 'cop_cal');
+    $select->addField('f', 'total_cop');
+    $select->addField('f', 'chal_a');
+    $select->addField('f', 'chal_b');
+    $select->addField('f', 'total_chal');
+    $select->addField('f', 'lep_pre_male');
+    $select->addField('f', 'lep_pre_female');
+    $select->addField('f', 'lep_pre_unid');
+    $select->addField('f', 'total_lep_pre');
+    $select->addField('f', 'lep_adult_male');
+    $select->addField('f', 'lep_adult_female');
+    $select->addField('f', 'lep_gravid');
+    $select->addField('f', 'lep_adult_unid');
+    $select->addField('f', 'total_lep_adult');
+    $select->addField('f', 'total_lep');
+    $select->addField('f', 'cal_pre_male');
+    $select->addField('f', 'cal_pre_female');
+    $select->addField('f', 'cal_pre_unid');
+    $select->addField('f', 'total_cal_pre');
+    $select->addField('f', 'cal_adult_male');
+    $select->addField('f', 'cal_adult_female');
+    $select->addField('f', 'cal_gravid');
+    $select->addField('f', 'cal_adult_unid');
+    $select->addField('f', 'total_cal_adult');
+    $select->addField('f', 'total_cal');
+    $select->addField('f', 'total_motile');
+    $select->addField('f', 'total_lice');
+    $select->addField('f', 'scar_chal');
+    $select->addField('f', 'scar_mob');
+    $select->addField('f', 'pred_mark');
+    $select->addField('f', 'hem');
+    $select->addField('f', 'mate_guard');
+    $select->addField('f', 'pin_belly');
+    $select->addField('f', 'tissue_damage');
+    $select->addField('f', 'comments');
   }
-  
+
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -695,20 +692,20 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
 //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Field results/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Field/' . $id);
   }
-  
+
 //  Add the message identifying what criteria were used to create the results
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $site_message . $no_message,
   );
-  
+
   //  Create a 'download CSV' button to allow the results of the query to be exported
   $form['form']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Download CSV')
-    );
-  
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
+
 //  If the query doesn't return any results then notify the user, otherwise create the table
   if ($rows == NULL) {
     $form['form']['none'] = array(
@@ -725,7 +722,7 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
     if ($no_results == 'all') {
       $no_results = count($rows);
     }
-    
+
 //    $sum_chalimus = bamp_sum('total_chal', $rows);
 //
 //    $ave_chalimus = $sum_chalimus / $no_results;
@@ -765,20 +762,20 @@ function bamprepfield_form($form, &$form_state, $species_id, $trip_id, $site_id,
       '#quantity' => 10,
     );
   }
-  
-  $result = prep_for_csv($header, $rows);
-  
+
+  $result = bamp_prep_for_csv($header, $rows);
+
 //  Pass the data as a hidden variable in the form_state array
   $form['data'] = array(
     '#type' => 'hidden',
     '#value' => $result,
   );
-  
+
   return $form;
 }
 
-function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20, $data='y') {
-  return drupal_get_form('bamprepfield_form', $species_id, $trip_id, $site_id, $no_results, $data);
+function bamp_report_field_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL, $no_results=20, $data='y') {
+  return drupal_get_form('bamp_report_field_form', $species_id, $trip_id, $site_id, $no_results, $data);
 }
 
 /**
@@ -790,23 +787,21 @@ function bamprepfield_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NU
  * @param string $lab
  * @return int 
  */
+function bamp_report_field_form_submit($form, &$form_state) {
 
-function bamprepfield_form_submit($form, &$form_state) {
-  
-$result = $form_state['values']['data'];
+  $result = $form_state['values']['data'];
 
-$filename = 'data.csv';
+  $filename = 'data.csv';
 
-drupal_add_http_header('Content-Type', 'text/csv');
-drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
-  
-print($result) . "\r\n";
- 
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
   exit;
-
 }
 
-function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
+function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   drupal_set_title(t('Lab results report form'));
 
   if ($species_id == NULL) {
@@ -905,7 +900,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     t('Condition factor'),
     t('Scarring'),
     t('Comments'),
-    );
+  );
 
   $form['form'] = array(
     '#type' => 'fieldset',
@@ -988,7 +983,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   $select->addField('l', 'total_lice');
   $select->addField('l', 'condition_factor');
   $select->addField('l', 'scarring');
-  $select->addField('l', 'comments');  
+  $select->addField('l', 'comments');
   $select->orderBy($order, $sort);
   $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1004,9 +999,9 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
 //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Individual Lab results/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Lab/' . $id);
   }
-  
+
   if ($rows == NULL) {
     $form['form']['none'] = array(
       '#markup' => '<p><h1>No results found</h1></p>',
@@ -1026,7 +1021,7 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
     $sum_length = bamp_sum('length', $rows);
 
     $ave_length = round($sum_length / $page_limit, 2);
-    
+
     $sum_caligus = bamp_sum('total_caligus', $rows);
 
     $ave_caligus = $sum_caligus / $page_limit;
@@ -1076,11 +1071,11 @@ function bampreplab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   return $form;
 }
 
-function bampreplab_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
-  return drupal_get_form('bampreplab_form', $species_id, $trip_id, $site_id);
+function bamp_report_lab_menu_callback($species_id=NULL, $trip_id=NULL, $site_id=NULL) {
+  return drupal_get_form('bamp_report_lab_form', $species_id, $trip_id, $site_id);
 }
 
-function bamprepenv_form($form_state) {
+function bamp_report_environment_form($form_state) {
   drupal_set_title(t('Environmental data'));
 
   $form = array();
@@ -1127,13 +1122,13 @@ function bamprepenv_form($form_state) {
     t('Oxygen'),
     t('Salinity'),
     t('Depth'),
-    );
-  
-   $select = db_select('bamp_environment', 'e')
+  );
+
+  $select = db_select('bamp_environment', 'e')
       ->extend('TableSort')
       ->extend("PagerDefault")
       ->limit($page_limit);
-   
+
   $select->addField('e', 'id');
   $select->addField('e', 'date');
   $select->addField('e', 'site_name');
@@ -1150,34 +1145,34 @@ function bamprepenv_form($form_state) {
 
     $rows[] = array_map('check_plain', $result);
   }
-  
-   $nr = count($rows);
-  
+
+  $nr = count($rows);
+
   //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Environment data/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Environment/' . $id);
   }
-  
+
   $form['Form'] = array(
-      '#theme' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-    );
-  
-    $form['pager'] = array(
-      '#theme' => 'pager',
-      '#quantity' => 10,
-    );
-  
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+
+  $form['pager'] = array(
+    '#theme' => 'pager',
+    '#quantity' => 10,
+  );
+
   return $form;
 }
 
-function bamprepenv_menu_callback() {
-  return drupal_get_form('bamprepenv_form');
+function bamp_report_environment_menu_callback() {
+  return drupal_get_form('bamp_report_environment_form');
 }
 
-function bamprepweather_form($form_state) {
+function bamp_report_weather_form($form_state) {
   drupal_set_title(t('Weather data'));
 
   $form = array();
@@ -1233,13 +1228,13 @@ function bamprepweather_form($form_state) {
     t('Rain'),
     t('Pressure'),
     t('Arc int'),
-    );
-  
-   $select = db_select('bamp_weather', 'w')
+  );
+
+  $select = db_select('bamp_weather', 'w')
       ->extend('TableSort')
       ->extend("PagerDefault")
       ->limit($page_limit);
-   
+
   $select->addField('w', 'id');
   $select->addField('w', 'date');
   $select->addField('w', 'time');
@@ -1265,34 +1260,34 @@ function bamprepweather_form($form_state) {
 
     $rows[] = array_map('check_plain', $result);
   }
-  
-   $nr = count($rows);
-  
+
+  $nr = count($rows);
+
   //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Weather data/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Weather/' . $id);
   }
-  
+
   $form['Form'] = array(
-      '#theme' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-    );
-  
-    $form['pager'] = array(
-      '#theme' => 'pager',
-      '#quantity' => 10,
-    );
-  
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+
+  $form['pager'] = array(
+    '#theme' => 'pager',
+    '#quantity' => 10,
+  );
+
   return $form;
 }
 
-function bamprepweather_menu_callback() {
-  return drupal_get_form('bamprepweather_form');
+function bamp_report_weather_menu_callback() {
+  return drupal_get_form('bamp_report_weather_form');
 }
 
-function bamp_trip_report_form($form_state) {
+function bamp_report_trip_form($form_state) {
   drupal_set_title(t('Trip data'));
 
   $form = array();
@@ -1340,13 +1335,13 @@ function bamp_trip_report_form($form_state) {
     t('Vessel'),
     t('Method'),
     t('Comments'),
-    );
-  
-   $select = db_select('bamp_trip', 't')
+  );
+
+  $select = db_select('bamp_trip', 't')
       ->extend('TableSort')
       ->extend("PagerDefault")
       ->limit($page_limit);
-   
+
   $select->addField('t', 'id');
   $select->addField('t', 'start_date');
   $select->addField('t', 'start_time');
@@ -1364,29 +1359,29 @@ function bamp_trip_report_form($form_state) {
 
     $rows[] = array_map('check_plain', $result);
   }
-  
-   $nr = count($rows);
-  
+
+  $nr = count($rows);
+
   //  Loop to replace the ID text with a link to the edit form for that entry
   for ($i = 0; $i < $nr; $i++) {
     $id = $rows[$i]['id'];
-    $rows[$i]['id'] = l($id, 'bamp/Edit forms/Trip data/' . $id);
+    $rows[$i]['id'] = l($id, 'bamp/Edit/Trip/' . $id);
   }
-  
+
   $form['Form'] = array(
-      '#theme' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-    );
-  
-    $form['pager'] = array(
-      '#theme' => 'pager',
-      '#quantity' => 10,
-    );
-  
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+
+  $form['pager'] = array(
+    '#theme' => 'pager',
+    '#quantity' => 10,
+  );
+
   return $form;
 }
 
-function bamp_trip_report_menu_callback() {
-  return drupal_get_form('bamp_trip_report_form');
+function bamp_report_trip_menu_callback() {
+  return drupal_get_form('bamp_report_trip_form');
 }

@@ -14,9 +14,9 @@
 
 //  Added conditions to the functions because drupal was complaining about the functions
 //  already having been declared.
-if (!function_exists('next_id_bamp')) {
+if (!function_exists('bamp_next_id')) {
 
-  function next_id_bamp($table) {
+  function bamp_next_id($table) {
 
 //  Queries the $table in the drupal database and 
 //  returns the next number for the id field
@@ -42,9 +42,9 @@ if (!function_exists('next_id_bamp')) {
  * @param type $delimiter
  * @return type 
  */
-if (!function_exists('csv2aa')) {
+if (!function_exists('bamp_csv2aa')) {
 
-  function csv2aa($file, $delimiter) {
+  function bamp_csv2aa($file, $delimiter) {
     if (($handle = fopen($file, "r")) !== FALSE) {
       $i = 0;
       while (($line_array = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
@@ -67,23 +67,23 @@ if (!function_exists('csv2aa')) {
  * @param type $field
  * @return type 
  */
-if (!function_exists('db_list')) {
+if (!function_exists('bamp_db_list')) {
 
-  function db_list($table, $field) {
+  function bamp_db_list($table, $field) {
 
     $list = db_select($table, 't')
         ->fields('t', array('id', $field));
     $result = $list->execute();
 
-    $lista = array();
+    $list_array = array();
 
     while ($value = $result->fetchAssoc()) {
-      $lista[$value['id']] = $value[$field];
+      $list_array[$value['id']] = $value[$field];
     }
 
-    $listu = array_unique($lista);
+    $list_unique = array_unique($list_array);
 
-    return $listu;
+    return $list_unique;
   }
 
 }
@@ -112,14 +112,17 @@ if (!function_exists('bamp_sum')) {
 
 }
 
-if (!function_exists('r_implode')) {
+/**
+ * Function to recursively implode a multidimensional array
+ */
+if (!function_exists('bamp_r_implode')) {
 
-  function r_implode($glue1, $glue2, $pieces=NULL) {
+  function bamp_r_implode($glue1, $glue2, $pieces=NULL) {
     $ret_val = array();
 
     foreach ($pieces as $r_pieces) {
       if (is_array($r_pieces)) {
-        $ret_val[] = r_implode($glue2, $glue2, $r_pieces);
+        $ret_val[] = bamp_r_implode($glue2, $glue2, $r_pieces);
       }
       else {
         $ret_val[] = (int) $r_pieces;
@@ -136,12 +139,15 @@ if (!function_exists('r_implode')) {
 
 }
 
-if (!function_exists('d_implode')) {
+/**
+ * Function to recursively implode a multidimensional array using only one 'glue' character
+ */
+if (!function_exists('bamp_d_implode')) {
 
-  function d_implode($glue, $pieces) {
+  function bamp_d_implode($glue, $pieces) {
     foreach ($pieces as $r_pieces) {
       if (is_array($r_pieces)) {
-        $ret_val[] = d_implode($glue, $r_pieces);
+        $ret_val[] = bamp_d_implode($glue, $r_pieces);
       }
       else {
         $ret_val[] = $r_pieces;
@@ -157,9 +163,9 @@ if (!function_exists('d_implode')) {
  * @param type $result
  * @param type $filename 
  */
-if (!function_exists('export_to_csv')) {
+if (!function_exists('bamp_export_to_csv')) {
 
-  function export_to_csv($data, $filename = 'myfile.csv') {
+  function bamp_export_to_csv($data, $filename = 'myfile.csv') {
     drupal_add_http_header('Content-Type', 'text/csv');
     drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
 
@@ -176,9 +182,9 @@ if (!function_exists('export_to_csv')) {
  * @param type $rows
  * @return string 
  */
-if (!function_exists('prep_for_csv')) {
+if (!function_exists('bamp_prep_for_csv')) {
 
-  function prep_for_csv($header, $rows) {
+  function bamp_prep_for_csv($header, $rows) {
 
     $no = count($header);
 
@@ -211,9 +217,9 @@ if (!function_exists('prep_for_csv')) {
 
 }
 
-if (!function_exists('user_name')) {
+if (!function_exists('bamp_user_name')) {
 
-  function user_name($userid) {
+  function bamp_user_name($userid) {
     $query = db_select('users', 'u');
     $query->condition('u.uid', $userid, '=');
     $query->addField('u', 'name');
