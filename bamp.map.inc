@@ -38,39 +38,42 @@ function bamp_maps1_form($form_state) {
   $map = new GoogleMapAPIv3();
   $map->_minify_js = isset($_REQUEST["min"]) ? FALSE : TRUE;
   $map->disableSidebar();
-  
+
 //  $map->setCenterCoords('-126.63505417', '50.60522917');
-  
+
   $select = db_select('bamp_sites', 's');
-      $select->addField('s', 'min_latitude');
-      $select->addField('s', 'min_longitude');
-      $select->addField('s', 'name');
-      $select->addField('s', 'id');
+  $select->addField('s', 'min_latitude');
+  $select->addField('s', 'min_longitude');
+  $select->addField('s', 'name');
+  $select->addField('s', 'id');
   $result = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
-  
+
   $nm = count($result);
-  
+
   for ($i = 0; $i < $nm; $i++) {
-    
+
     if ($result[$i]['min_longitude'] != 0) {
       $name = $result[$i]['name'];
       $id = $result[$i]['id'];
 
-  $map->addMarkerByCoords($result[$i]['min_longitude'], $result[$i]['min_latitude'], $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a>');
+      $map->addMarkerByCoords($result[$i]['min_longitude'], $result[$i]['min_latitude'], $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a>');
     }
   }
-  
+
+  $map->disableZoomEncompass();
+  $map->setBoundsFudge('0.001');
+  $map->setZoomLevel('8');
   $map->printSidebar();
   $map->printOnLoad();
 
   drupal_add_js($map->getMapJS(), 'inline');
-  
+
   $form['form']['map_div1'] = array(
     '#type' => 'markup',
     '#markup' => <<<EOL
   <script type="text/javascript">window.onload=onLoadmap;</script>
 EOL
-  ,
+      ,
   );
 
   $form['form']['map_div2'] = array(
@@ -78,16 +81,16 @@ EOL
     '#markup' => <<<EOF
     <script type="text/javascript">document.write('<div id="map" style="width: 500px; height: 500px; position:relative;"><\/div>');</script>
 EOF
-    ,
+      ,
   );
-  
+
   $print_map = $map->getHeaderJS();
-  
+
   $form['form']['map_div3'] = array(
     '#type' => 'markup',
     '#markup' => $print_map,
   );
-  
+
   return $form;
 }
 
