@@ -244,10 +244,10 @@ if ($species == "") {
   $data = $chart->toPrettyString();
   
 //  JS to render the chart and display it in a div
-  drupal_add_js('sites/default/modules/bamp/charts/js/json/json2.js');
-  drupal_add_js('sites/default/modules/bamp/charts/js/swfobject.js');
+  drupal_add_js(drupal_get_path('module', 'BAMP') . '/charts/js/json/json2.js');
+  drupal_add_js(drupal_get_path('module', 'BAMP') . '/charts/js/swfobject.js');
   $chart_data = '<script type="text/javascript">
-  swfobject.embedSWF("sites/default/modules/bamp/charts/open-flash-chart.swf", "div_chart", "' . $chart_width . '", "500", "9.0.0", "expressInstall.swf", {"get-data":"get_data_1"}, {"wmode" : "transparent"} );
+  swfobject.embedSWF("' . drupal_get_path('module', 'BAMP') . '/charts/open-flash-chart.swf", "div_chart", "' . $chart_width . '", "500", "9.0.0", "expressInstall.swf", {"get-data":"get_data_1"}, {"wmode" : "transparent"} );
  
   function ofc_ready() {}
  

@@ -56,7 +56,7 @@ function bamp_maps1_form($form_state) {
       $name = $result[$i]['name'];
       $id = $result[$i]['id'];
 
-  $map->addMarkerByCoords($result[$i]['min_longitude'], $result[$i]['min_latitude'], $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a>', $tooltip="", $filename="http://www.bradwedell.com/phpgooglemapapi/demos/img/triangle_icon.png");
+  $map->addMarkerByCoords($result[$i]['min_longitude'], $result[$i]['min_latitude'], $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a>');
     }
   }
   
