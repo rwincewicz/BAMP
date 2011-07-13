@@ -55,8 +55,10 @@ function bamp_maps1_form($form_state) {
     if ($result[$i]['min_longitude'] != 0) {
       $name = $result[$i]['name'];
       $id = $result[$i]['id'];
+      $latitude = $result[$i]['min_latitude'];
+      $longitude = $result[$i]['min_longitude'];
 
-      $map->addMarkerByCoords($result[$i]['min_longitude'], $result[$i]['min_latitude'], $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a>');
+      $map->addMarkerByCoords($longitude, $latitude, $name, '<a href="?q=bamp/Edit/Site/' . $id . '">' . $name . '</a></br>Latitude: ' . $latitude . '</br>Longitude: ' . $longitude);
     }
   }
 

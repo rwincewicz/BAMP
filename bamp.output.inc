@@ -392,8 +392,19 @@ function bamp_report_site_form($form, &$form_state) {
     $rows[$i]['id'] = l($id, 'bamp/Edit/Site/' . $id);
   }
 
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Details'),
+  );
+  
+   //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
+  
 //  Create table
-  $form['Form'] = array(
+  $form['table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
@@ -418,6 +429,20 @@ function bamp_report_site_form($form, &$form_state) {
 
 function bamp_report_site_menu_callback() {
   return drupal_get_form('bamp_report_site_form');
+}
+
+function bamp_report_site_form_submit($form, &$form_state) {
+
+  $result = $form_state['values']['data'];
+
+  $filename = 'site_data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
+  exit;
 }
 
 /**
@@ -498,6 +523,7 @@ function bamp_report_field_form($form, &$form_state, $species_id, $trip_id, $sit
     t('To Lab'),
     t('Date'),
     t('Pen'),
+    t('Method'),
     t('Input name'),
     t('Route'),
     t('Repetition number'),
@@ -521,6 +547,7 @@ function bamp_report_field_form($form, &$form_state, $species_id, $trip_id, $sit
       t('To Lab'),
       t('Date'),
       t('Pen'),
+      t('Method'),
       t('Input name'),
       t('Route'),
       t('Repetition number'),
@@ -628,6 +655,7 @@ function bamp_report_field_form($form, &$form_state, $species_id, $trip_id, $sit
   $select->addField('f', 'to_lab');
   $select->addField('f', 'date');
   $select->addField('f', 'pen');
+  $select->addField('f', 'method');
   $select->addField('f', 'input_name');
   $select->addField('f', 'route');
   $select->addField('f', 'rep_no');
@@ -778,20 +806,11 @@ function bamp_report_field_menu_callback($species_id=NULL, $trip_id=NULL, $site_
   return drupal_get_form('bamp_report_field_form', $species_id, $trip_id, $site_id, $no_results, $data);
 }
 
-/**
- * Create the report form for the lab result data
- * @param type $form
- * @param type $form_state
- * @param string $species_id
- * @param string $trip_id
- * @param string $lab
- * @return int 
- */
 function bamp_report_field_form_submit($form, &$form_state) {
 
   $result = $form_state['values']['data'];
 
-  $filename = 'data.csv';
+  $filename = 'field_data.csv';
 
   drupal_add_http_header('Content-Type', 'text/csv');
   drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
@@ -801,6 +820,15 @@ function bamp_report_field_form_submit($form, &$form_state) {
   exit;
 }
 
+/**
+ * Create the report form for the lab result data
+ * @param type $form
+ * @param type $form_state
+ * @param string $species_id
+ * @param string $trip_id
+ * @param string $lab
+ * @return int 
+ */
 function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) {
   drupal_set_title(t('Lab results report form'));
 
@@ -939,6 +967,12 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
   $form['form']['details'] = array(
     '#markup' => $species_message . $trip_message . $lab_message,
   );
+  
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
 
   $select->addField('l', 'id');
   $select->addField('l', 'fish_id');
@@ -1068,6 +1102,14 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
     );
   }
 
+  $result = bamp_prep_for_csv($header, $rows);
+
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
@@ -1075,14 +1117,24 @@ function bamp_report_lab_menu_callback($species_id=NULL, $trip_id=NULL, $site_id
   return drupal_get_form('bamp_report_lab_form', $species_id, $trip_id, $site_id);
 }
 
+function bamp_report_lab_form_submit($form, &$form_state) {
+
+  $result = $form_state['values']['data'];
+
+  $filename = 'lab_data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
+  exit;
+}
+
 function bamp_report_environment_form($form_state) {
   drupal_set_title(t('Environmental data'));
 
   $form = array();
-
-  $content['form'] = array(
-    '#markup' => '<p> This is the BAMP environmental form</p>',
-  );
 
   // Check if there is sorting request
   if (isset($_GET['sort']) && isset($_GET['order'])) {
@@ -1111,6 +1163,17 @@ function bamp_report_environment_form($form_state) {
   }
 
   $form = array();
+  
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Details',
+  );
+  
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
 
   $page_limit = 20;
 
@@ -1154,7 +1217,7 @@ function bamp_report_environment_form($form_state) {
     $rows[$i]['id'] = l($id, 'bamp/Edit/Environment/' . $id);
   }
 
-  $form['Form'] = array(
+  $form['table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
@@ -1165,6 +1228,14 @@ function bamp_report_environment_form($form_state) {
     '#quantity' => 10,
   );
 
+  $result = bamp_prep_for_csv($header, $rows);
+
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
@@ -1172,15 +1243,36 @@ function bamp_report_environment_menu_callback() {
   return drupal_get_form('bamp_report_environment_form');
 }
 
+function bamp_report_environment_form_submit($form, &$form_state) {
+
+  $result = $form_state['values']['data'];
+
+  $filename = 'environment_data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
+  exit;
+}
+
 function bamp_report_weather_form($form_state) {
   drupal_set_title(t('Weather data'));
 
   $form = array();
 
-  $content['form'] = array(
-    '#markup' => '<p> This is the BAMP weather form</p>',
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Details',
   );
-
+  
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
+  
   // Check if there is sorting request
   if (isset($_GET['sort']) && isset($_GET['order'])) {
     // Sort it Ascending or Descending?
@@ -1208,6 +1300,17 @@ function bamp_report_weather_form($form_state) {
   }
 
   $form = array();
+  
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Details',
+  );
+  
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
+  );
 
   $page_limit = 20;
 
@@ -1280,6 +1383,14 @@ function bamp_report_weather_form($form_state) {
     '#quantity' => 10,
   );
 
+  $result = bamp_prep_for_csv($header, $rows);
+
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
@@ -1287,13 +1398,34 @@ function bamp_report_weather_menu_callback() {
   return drupal_get_form('bamp_report_weather_form');
 }
 
+function bamp_report_weather_form_submit($form, &$form_state) {
+
+  $result = $form_state['values']['data'];
+
+  $filename = 'weather_data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
+  exit;
+}
+
 function bamp_report_trip_form($form_state) {
   drupal_set_title(t('Trip data'));
 
   $form = array();
 
-  $content['form'] = array(
-    '#markup' => '<p> This is the BAMP trip form</p>',
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Details',
+  );
+  
+  //  Create a 'download CSV' button to allow the results of the query to be exported
+  $form['form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Download CSV')
   );
 
   // Check if there is sorting request
@@ -1321,8 +1453,6 @@ function bamp_report_trip_form($form_state) {
     $sort = 'ASC';
     $order = 'id';
   }
-
-  $form = array();
 
   $page_limit = 20;
 
@@ -1379,9 +1509,31 @@ function bamp_report_trip_form($form_state) {
     '#quantity' => 10,
   );
 
+  $result = bamp_prep_for_csv($header, $rows);
+
+//  Pass the data as a hidden variable in the form_state array
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => $result,
+  );
+  
   return $form;
 }
 
 function bamp_report_trip_menu_callback() {
   return drupal_get_form('bamp_report_trip_form');
+}
+
+function bamp_report_trip_form_submit($form, &$form_state) {
+
+  $result = $form_state['values']['data'];
+
+  $filename = 'trip_data.csv';
+
+  drupal_add_http_header('Content-Type', 'text/csv');
+  drupal_add_http_header('Content-Disposition: attachment', 'filename=' . $filename);
+
+  print($result) . "\r\n";
+
+  exit;
 }

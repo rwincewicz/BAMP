@@ -22,7 +22,7 @@ function bamp_upload_form($form_state) {
   $form['form'] = array(
     '#markup' => '<p>This is the BAMP upload menu</p>',
   );
-  
+
 //  $form['form'] = array(
 //    '#markup' => '<A href="?q=bamp/Upload%20forms/Crawford%20Site%20CSV%20upload">Crawford Site CSV upload</A></br>
 //      <A href="?q=bamp/Upload%20forms/Crawford%20field%20results%20CSV%20upload">Crawford field results CSV upload</A></br>
@@ -372,14 +372,14 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
     $lep_paf = $aa[$j][16];
     $lep_am = $aa[$j][17];
     $lep_af = $aa[$j][18];
-    
+
     if ($aa[$j][19] !== '') {
       $total_lep = $aa[$j][19];
     }
     else {
       $total_lep = NULL;
     }
-    
+
     $cal_c0 = $aa[$j][20];
     $cal_c1 = $aa[$j][21];
     $cal_c2 = $aa[$j][22];
@@ -389,7 +389,7 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
     $cal_paf = $aa[$j][26];
     $cal_am = $aa[$j][27];
     $cal_af = $aa[$j][28];
-    
+
     if ($aa[$j][29] !== '') {
       $total_cal = $aa[$j][29];
     }
@@ -403,19 +403,19 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
     else {
       $total_lice = NULL;
     }
-    
+
     $lesions = $aa[$j][31];
     $lesions = str_replace(',', ';', $lesions);
 
     $comments = $aa[$j][32];
     $comments = str_replace(',', ';', $comments);
-    
+
     $change_log = $aa[$j][33];
     $change_log = str_replace(',', ';', $change_log);
-    
+
     $uid = user_uid_optional_to_arg('%');
     $username = bamp_user_name($uid);
-    
+
     if ($lspecies == '') {
       $lspecies = 'Same';
     }
@@ -713,7 +713,7 @@ function bamp_upload_marty_site_form_submit($form, &$form_state) {
   $na = (count($aa) - 1);
 
   drupal_set_message(t('There are ' . "@na" . ' entries in this file', array('@na' => $na)));
-  
+
   for ($j = 1; $j <= $na; $j++) {
 
     $group = 'marty';
@@ -727,8 +727,8 @@ function bamp_upload_marty_site_form_submit($form, &$form_state) {
     $lat = $aa[$j][7];
     $lon = $aa[$j][8];
 //    These need to go into the environmental table
-//    $temp = $aa[$j][9];
-//    $sal = $aa[$j][10];
+    $temp = $aa[$j][9];
+    $sal = $aa[$j][10];
 
     if (!is_numeric($lat)) {
       $lat = 0;
@@ -738,13 +738,13 @@ function bamp_upload_marty_site_form_submit($form, &$form_state) {
       $lon = 0;
     }
 
-//    if (! is_numeric($temp)) {
-//      $temp = NULL;
-//    }
-//    
-//    if (!is_numeric($sal)) {
-//      $sal = NULL;
-//    }
+    if (!is_numeric($temp)) {
+      $temp = NULL;
+    }
+
+    if (!is_numeric($sal)) {
+      $sal = NULL;
+    }
 
     $uid = user_uid_optional_to_arg('%');
     $username = bamp_user_name($uid);
@@ -762,6 +762,18 @@ function bamp_upload_marty_site_form_submit($form, &$form_state) {
           'min_longitude' => $lon,
 //          'temp' => $temp,
 //          'sal' => $sal,
+          'group_name' => $group,
+          'upload_user' => $username,
+        ))
+        ->execute();
+
+    $sample2 = db_insert('bamp_environment')
+        ->fields(array(
+          'date' => $date,
+          'site_name' => $site_name,
+          'temp' => $temp,
+          'sal' => $sal,
+          'depth' => '0',
           'group_name' => $group,
           'upload_user' => $username,
         ))
@@ -1007,6 +1019,7 @@ function bamp_upload_environment_form_submit($form, &$form_state) {
     var_dump($aaj);
 
     $site_name = 'unknown';
+    $group = 'grieg';
     $date_field = explode(' ', $aaj[1]);
     $date = $date_field[1];
     $temp_1 = $aaj[13];
@@ -1025,6 +1038,7 @@ function bamp_upload_environment_form_submit($form, &$form_state) {
           'oxygen' => $oxygen_1,
           'sal' => $sal_1,
           'depth' => $depth_1,
+          'group_name' => $group,
           'upload_user' => $username,
         ))
         ->execute();
@@ -1042,6 +1056,7 @@ function bamp_upload_environment_form_submit($form, &$form_state) {
           'oxygen' => $oxygen_5,
           'sal' => $sal_5,
           'depth' => $depth_5,
+          'group_name' => $group,
           'upload_user' => $username,
         ))
         ->execute();
@@ -1059,6 +1074,7 @@ function bamp_upload_environment_form_submit($form, &$form_state) {
           'oxygen' => $oxygen_10,
           'sal' => $sal_10,
           'depth' => $depth_10,
+          'group_name' => $group,
           'upload_user' => $username,
         ))
         ->execute();
@@ -1076,6 +1092,7 @@ function bamp_upload_environment_form_submit($form, &$form_state) {
           'oxygen' => $oxygen_15,
           'sal' => $sal_15,
           'depth' => $depth_15,
+          'group_name' => $group,
           'upload_user' => $username,
         ))
         ->execute();
@@ -1697,4 +1714,206 @@ function dfo_upload_trip_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
+}
+
+/**
+ * Create MarineHarvest CSV upload form
+ */
+function bamp_upload_marineharvest_form($form_state) {
+  drupal_set_title(t('Marineharvest CSV upload form'));
+
+  $form = array();
+
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('CSV upload'),
+  );
+
+  $form['form']['csv'] = array(
+    '#type' => 'file',
+    '#title' => t('Select a CSV file'),
+    '#size' => 40,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#executes_submit_callback' => TRUE,
+  );
+
+  return $form;
+}
+
+function bamp_upload_marineharvest_menu_callback() {
+  return drupal_get_form('bamp_upload_marineharvest_form');
+}
+
+function bamp_upload_marineharvest_form_validate($form, &$form_state) {
+
+  $validators = array('file_validate_extensions' => array('csv'));
+  $file = file_save_upload('csv', $validators);
+
+  if (!$file)
+    form_set_error('upload', 'You must select a valid file to upload.');
+  else {
+    // Manually add the uploaded file to the $form_state
+    $form_state['values']['csv']['title'] = $file->filename;
+    $form_state['values']['csv']['file'] = $file;
+    $form_state['values']['csv']['filepath'] = $file->destination;
+  }
+}
+
+function bamp_upload_marineharvest_form_submit($form, &$form_state) {
+
+  $csv_file_path = $form_state['values']['csv']['filepath'];
+  $csv_file_name = $form_state['values']['csv']['title'];
+
+  $aa = bamp_csv2aa($csv_file_path, ',');
+
+  // Variables common to all the sample batches in the file
+  $site_name = $aa[0][3];
+  $total_fish = $aa[0][10];
+  $count_date = $aa[7][1];
+  $method = $aa[9][2];
+  $group = 'marineharvest';
+
+  $uid = user_uid_optional_to_arg('%');
+  $username = bamp_user_name($uid);
+
+  drupal_set_message(t('Site: ' . $site_name));
+  drupal_set_message(t('Number of fish: ' . $total_fish));
+  drupal_set_message(t('Method: ' . $method));
+  drupal_set_message(t('Date counted: ' . $count_date));
+
+  $sample1 = db_insert('bamp_farm_data')
+          ->fields(array(
+            'farm_id' => $site_name,
+            'date' => $count_date,
+            'total_fish' => $total_fish,
+            'group_name' => $group,
+            'upload_user' => $username,
+          ))
+          ->execute();
+
+  for ($i = 0; $i <= 2; $i++) {
+
+    // Variables that may vary between sample batches
+
+    if ($i == 0) {
+      $ddiff = 0;
+      $udiff = 0;
+      $pdiff = 0;
+    }
+    elseif ($i == 1) {
+      $ddiff = 47;
+      $udiff = 46;
+      $pdiff = 47;
+    }
+    else {
+      $ddiff = 100;
+      $udiff = 99;
+      $pdiff = 100;
+    }
+
+    $date = $aa[7 + $ddiff][1];
+    $user = $aa[7 + $udiff][5];
+    $pen = $aa[8 + $pdiff][1];
+    $no_sampled = $aa[8 + $pdiff][5];
+
+    $mdate = ($date * 86400);
+
+    $rdate = date('d-M-y H:m:s', $timestamp = $mdate);
+
+    drupal_set_message(t('Date: ' . $rdate));
+    drupal_set_message(t('User: ' . $user));
+    drupal_set_message(t('Pen: ' . $pen));
+    drupal_set_message(t('No sampled: ' . $no_sampled));
+
+    for ($j = 0; $j <= 19; $j++) {
+
+      // Variables that vary within a sample batch
+
+      $rid = bamp_next_id('bamp_field_results');
+
+      $fid = $aa[11 + $pdiff + $j][0];
+      $size = $aa[11 + $pdiff + $j][1];
+      if ($size == '') {
+        $size = '0';
+      }
+      $chal = $aa[11 + $pdiff + $j][2];
+      if ($chal == '') {
+        $chal = '0';
+      }
+      $pre = $aa[11 + $pdiff + $j][3];
+      if ($pre == '') {
+        $pre = '0';
+      }
+      $male = $aa[11 + $pdiff + $j][4];
+      if ($male == '') {
+        $male = '0';
+      }
+      $female = $aa[11 + $pdiff + $j][5];
+      if ($female == '') {
+        $female = '0';
+      }
+      $grav = $aa[11 + $pdiff + $j][6];
+      if ($grav == '') {
+        $grav = '0';
+      }
+      $cal = $aa[11 + $pdiff + $j][7];
+      if ($cal == '') {
+        $cal = '0';
+      }
+      $mot = $aa[11 + $pdiff + $j][8];
+      if ($mot == '') {
+        $mot = '0';
+      }
+      $comm = $aa[11 + $pdiff + $j][10];
+
+      $total_lice = $mot + $chal;
+      
+      $fish_id = 'M' . $date . '-' . $site_name . '-' . $pen . '-' . $fid;
+      
+      drupal_set_message(t('Fish ID: ' . $fish_id));
+      drupal_set_message(t('Size: ' . $size));
+      drupal_set_message(t('Chalimus: ' . $chal));
+      drupal_set_message(t('Pre-adult: ' . $pre));
+      drupal_set_message(t('Male: ' . $male));
+      drupal_set_message(t('Female: ' . $female));
+      drupal_set_message(t('Gravid: ' . $grav));
+      drupal_set_message(t('Caligus: ' . $cal));
+      drupal_set_message(t('Motile: ' . $mot));
+      drupal_set_message(t('Total lice: ' . $total_lice));
+      drupal_set_message(t('Comments: ' . $comm));
+
+      $sample = db_insert('bamp_field_results')
+          ->fields(array(
+            'fish_id' => $fish_id,
+            'sample_id' => $fid,
+            'date' => $mdate,
+            'site_name' => $site_name,
+            'method' => $method,
+            'no_sampled' => $no_sampled,
+            'crew' => $user,
+            'pen' => $pen,
+            'weight' => $size,
+            'lep_adult_female' => $female,
+            'lep_gravid' => $grav,
+            'lep_adult_male' => $male,
+            'total_cal' => $cal,
+            'total_chal' => $chal,
+            'total_lep_pre' => $pre,
+            'total_motile' => $mot,
+            'total_lice' => $total_lice,
+            'comments' => $comm,
+            'group_name' => $group,
+            'upload_user' => $username,
+          ))
+          ->execute();
+    }
+  }
+
+  drupal_set_message(t('File ' . $csv_file_name . ' submitted successfully'));
 }

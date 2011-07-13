@@ -125,6 +125,13 @@ function bamp_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('upload form'),
   );
+  
+  $items['bamp/Upload/Marineharvest'] = array(
+    'title' => 'Marineharvest results CSV upload',
+    'page callback' => 'bamp_upload_marineharvest_menu_callback',
+    'access callback' => 'user_access',
+    'access arguments' => array('upload form'),
+  );
 
   $items['bamp/Upload/Weather'] = array(
     'title' => 'Weather CSV upload',

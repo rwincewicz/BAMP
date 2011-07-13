@@ -190,9 +190,21 @@ if (!function_exists('bamp_prep_for_csv')) {
 
 //  The first two headers are arrays because they can be sorted
 //  This code just pulls out the relevant data
+    
+    if (is_array($header[0]) == TRUE) {
     $result = $header[0]['data'];
+    }
+    else {
+      $result = $header[0];
+    }
     $result .= ',';
+    
+    if (is_array($header[1]) == TRUE) {
     $result .= $header[1]['data'];
+    }
+    else {
+      $result .= $header[1];
+    }
 
 //  Loop through the remaining headers
     for ($i = 2; $i < $no; $i++) {
@@ -208,7 +220,7 @@ if (!function_exists('bamp_prep_for_csv')) {
 
 //  Loop through the data in the rows putting commas and line breaks where required
     for ($i = 0; $i < $nr; $i++) {
-      $result .= implode(',', $rows[$i]);
+      $result .= strip_tags(implode(',', $rows[$i]));
       $result .= "\r\n";
     }
 

@@ -821,7 +821,7 @@ function bamp_edit_field_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_field_results',
           'old_values' => $old_values,
@@ -1167,7 +1167,7 @@ function bamp_edit_site_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_sites',
           'old_values' => $old_values,
@@ -1512,7 +1512,7 @@ function bamp_edit_weather_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_weather',
           'old_values' => $old_values,
@@ -1767,7 +1767,7 @@ function bamp_edit_environment_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_environment',
           'old_values' => $old_values,
@@ -2067,7 +2067,7 @@ function bamp_edit_lab_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_lab_results',
           'old_values' => $old_values,
@@ -2332,7 +2332,7 @@ function bamp_edit_trip_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
-    $audit = db_insert('bamp_audit')
+    $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_trip',
           'old_values' => $old_values,
