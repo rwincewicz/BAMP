@@ -30,6 +30,7 @@ function bamp_edit_menu_callback() {
 function bamp_edit_field_form($form, &$form_state, $id) {
   drupal_set_title(t('Field results edit form'));
 
+//  Clear any residual warning messages but allow info messages to be displayed
   drupal_get_messages('warning');
 
   if ($id == NULL) {
@@ -64,6 +65,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
     '#title' => t('Entry details'),
   );
 
+// Bring all the relevent data out the of the db  
   $select = db_select('bamp_field_results', 'f');
 
   $select->condition('f.id', $id, '=');
@@ -130,6 +132,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
   if ($entries == NULL) {
     drupal_set_message(t('Entry not found!'), 'warning');
 
+//    Create form elements to handle prev and next buttons as well as reset and submit
     $form['form']['id'] = array(
       '#markup' => 'Id: ' . $id . ' ',
     );
@@ -162,6 +165,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
     return $form;
   }
 
+//  Save the old values as a string so that they can be put into the changelog 
   $old_values = implode(',', $entries[0]);
 
 //  Assign the data to variables casting them as the proper type so they go back in to the database properly 
@@ -223,6 +227,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
   $tissue_damage = $entries[0]['tissue_damage'];
   $comments = $entries[0]['comments'];
 
+//  Create prev and next buttons as well as an id label
   $form['form']['prev'] = array(
     '#type' => 'submit',
     '#value' => t('Prev'),
@@ -237,6 +242,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
     '#value' => t('Next'),
   );
 
+//  Populate textfields with the data from the db
   $form['form']['fish_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Fish ID'),
@@ -633,6 +639,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
     '#default_value' => $comments,
   );
 
+//  Create edit and reset buttons at the bottom
   $form['edit'] = array(
     '#type' => 'submit',
     '#value' => 'Edit',
@@ -643,6 +650,7 @@ function bamp_edit_field_form($form, &$form_state, $id) {
     '#value' => 'Reset',
   );
 
+//  Store the id and old values as hidden elements so they persist to the next form
   $form['id'] = array(
     '#type' => 'hidden',
     '#value' => $id,
@@ -666,28 +674,34 @@ function bamp_edit_field_menu_callback($id=NULL) {
 }
 
 function bamp_edit_field_form_submit($form, &$form_state) {
+// Determine what happened in the previous form and display relevent data
+//  if an id was entered into the id form then go to that entry
   if ($form_state['values']['data'] == 'new') {
     $id = $form_state['values']['newid'];
     drupal_goto('bamp/Edit/Field/' . $id);
   }
 
+//  If the reset button was clicked the reload the same entry from the db
   if ($form_state['clicked_button']['#value'] == $form_state['values']['reset']) {
     $id = $form_state['values']['id'];
     drupal_goto('bamp/Edit/Field/' . $id);
   }
 
+//  If the prev button was clicked then decrease the id and go to that entry
   if ($form_state['clicked_button']['#value'] == $form_state['values']['prev']) {
     $id = $form_state['values']['id'];
     --$id;
     drupal_goto('bamp/Edit/Field/' . $id);
   }
 
+  //  If the next button was clicked then increase the id and go to that entry
   if ($form_state['clicked_button']['#value'] == $form_state['values']['next']) {
     $id = $form_state['values']['id'];
     ++$id;
     drupal_goto('bamp/Edit/Field/' . $id);
   }
 
+//  If the edit button was clicked then write the new values to the db
   if ($form_state['clicked_button']['#value'] == $form_state['values']['edit']) {
     $id = $form_state['values']['id'];
     $fish_id = $form_state['values']['fish_id'];
@@ -821,6 +835,7 @@ function bamp_edit_field_form_submit($form, &$form_state) {
         ->condition('id', $id, '=')
         ->execute();
 
+//    And write the changes to the changelog table
     $changelog = db_insert('bamp_changelog')
         ->fields(array(
           'edited_table' => 'bamp_field_results',

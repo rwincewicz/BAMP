@@ -39,8 +39,6 @@ function bamp_maps1_form($form_state) {
   $map->_minify_js = isset($_REQUEST["min"]) ? FALSE : TRUE;
   $map->disableSidebar();
 
-//  $map->setCenterCoords('-126.63505417', '50.60522917');
-
   $select = db_select('bamp_sites', 's');
   $select->addField('s', 'min_latitude');
   $select->addField('s', 'min_longitude');

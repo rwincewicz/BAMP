@@ -6,10 +6,6 @@
  * @file
  * Code to create bamp upload forms
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * Create BAMP upload menu
@@ -190,6 +186,7 @@ function bamp_upload_crawford_field_form_submit($form, &$form_state) {
         ->execute();
   }
 
+//  TO DO: Set up message to display when upload failed rather than spewing errors plus the successful message
   drupal_set_message(t('File ' . "@csv_file_name" . ' submitted successfully', array('@csv_file_name' => $csv_file_name)));
 }
 

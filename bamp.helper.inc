@@ -6,6 +6,7 @@
  * @file
  * Helper functions for the BAMP module
  */
+
 /**
  * Function that gives the next value from a field in the specified table
  * @param type $table
@@ -33,7 +34,6 @@ if (!function_exists('bamp_next_id')) {
 
     return $nxid;
   }
-
 }
 
 /**
@@ -57,7 +57,6 @@ if (!function_exists('bamp_csv2aa')) {
     }
     return $arrarr;
   }
-
 }
 
 /**
@@ -77,15 +76,17 @@ if (!function_exists('bamp_db_list')) {
 
     $list_array = array();
 
+//    Pull out all of the values within the given field and populate an array
     while ($value = $result->fetchAssoc()) {
       $list_array[$value['id']] = $value[$field];
     }
 
+//    Only return the unique ones
+//    TO DO: Is there a way of just pulling the unique values from the db in the first place?
     $list_unique = array_unique($list_array);
 
     return $list_unique;
   }
-
 }
 
 /**
@@ -109,7 +110,6 @@ if (!function_exists('bamp_sum')) {
 
     return $sum;
   }
-
 }
 
 /**
@@ -136,7 +136,6 @@ if (!function_exists('bamp_r_implode')) {
       return implode($glue1, $ret_val);
     }
   }
-
 }
 
 /**
@@ -155,7 +154,6 @@ if (!function_exists('bamp_d_implode')) {
     }
     return implode($glue, $ret_val);
   }
-
 }
 
 /**
@@ -173,7 +171,6 @@ if (!function_exists('bamp_export_to_csv')) {
 
     exit;
   }
-
 }
 
 /**
@@ -188,8 +185,8 @@ if (!function_exists('bamp_prep_for_csv')) {
 
     $no = count($header);
 
-//  The first two headers are arrays because they can be sorted
-//  This code just pulls out the relevant data
+//  The first two headers might be arrays because they can be sorted
+//  This code checks to see if they are array and pulls out the relevant data
     
     if (is_array($header[0]) == TRUE) {
     $result = $header[0]['data'];
@@ -219,16 +216,19 @@ if (!function_exists('bamp_prep_for_csv')) {
     $nr = count($rows);
 
 //  Loop through the data in the rows putting commas and line breaks where required
+//  Strip tags will remove the HTML tags inserted to make the entry id a link to the edit form
     for ($i = 0; $i < $nr; $i++) {
       $result .= strip_tags(implode(',', $rows[$i]));
       $result .= "\r\n";
     }
-
+    
     return $result;
   }
-
 }
 
+/**
+ * Function to convert the uid to a username so that it makes sense in the changelog forms
+ */
 if (!function_exists('bamp_user_name')) {
 
   function bamp_user_name($userid) {
@@ -239,5 +239,4 @@ if (!function_exists('bamp_user_name')) {
     $username = implode(',', $name);
     return $username;
   }
-
 }
