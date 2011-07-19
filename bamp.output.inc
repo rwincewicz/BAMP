@@ -667,8 +667,8 @@ function bamp_report_field_form($form, &$form_state, $species_id, $trip_id, $sit
   $select->addField('f', 'weight');
 
   if ($data == 'y') {
-    $select->addField('f', 'cop_lep');
-    $select->addField('f', 'cop_cal');
+    $select->addField('f', 'lep_cop');
+    $select->addField('f', 'cal_cop');
     $select->addField('f', 'total_cop');
     $select->addField('f', 'chal_a');
     $select->addField('f', 'chal_b');
@@ -896,7 +896,7 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
     t('Species'),
     t('Weight/kg'),
     t('Length/mm'),
-    t('Lep_C0'),
+    t('Lep_cop'),
     t('Lep_C1'),
     t('Lep_C2'),
     t('Lep_C3'),
@@ -910,7 +910,7 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
     t('Lep_NM_Notid'),
     t('Lep_Mot_Notid'),
     t('Total Lep'),
-    t('Cal_C0'),
+    t('Cal_cop'),
     t('Cal_C1'),
     t('Cal_C2'),
     t('Cal_C3'),
@@ -986,7 +986,7 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
   $select->addField('l', 'species');
   $select->addField('l', 'weight');
   $select->addField('l', 'length');
-  $select->addField('l', 'lep_c0');
+  $select->addField('l', 'lep_cop');
   $select->addField('l', 'lep_c1');
   $select->addField('l', 'lep_c2');
   $select->addField('l', 'lep_c3');
@@ -1000,7 +1000,7 @@ function bamp_report_lab_form($form, &$form_state, $species_id, $trip_id, $lab) 
   $select->addField('l', 'lep_nm_notid');
   $select->addField('l', 'lep_mot_notid');
   $select->addField('l', 'total_lep');
-  $select->addField('l', 'cal_c0');
+  $select->addField('l', 'cal_cop');
   $select->addField('l', 'cal_c1');
   $select->addField('l', 'cal_c2');
   $select->addField('l', 'cal_c3');

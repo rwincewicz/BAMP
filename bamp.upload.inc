@@ -360,7 +360,7 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
     $lspecies = $aa[$j][7];
     $length = $aa[$j][8];
     $weight = $aa[$j][9];
-    $lep_c0 = $aa[$j][10];
+    $lep_cop = $aa[$j][10];
     $lep_c1 = $aa[$j][11];
     $lep_c2 = $aa[$j][12];
     $lep_c3 = $aa[$j][13];
@@ -377,7 +377,7 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
       $total_lep = NULL;
     }
 
-    $cal_c0 = $aa[$j][20];
+    $cal_cop = $aa[$j][20];
     $cal_c1 = $aa[$j][21];
     $cal_c2 = $aa[$j][22];
     $cal_c3 = $aa[$j][23];
@@ -432,7 +432,7 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
           'total_lep' => $total_lep,
           'total_caligus' => $total_cal,
           'total_lice' => $total_lice,
-          'lep_c0' => $lep_c0,
+          'lep_cop' => $lep_cop,
           'lep_c1' => $lep_c1,
           'lep_c2' => $lep_c2,
           'lep_c3' => $lep_c3,
@@ -441,7 +441,7 @@ function bamp_upload_crawford_lab_form_submit($form, &$form_state) {
           'lep_paf' => $lep_paf,
           'lep_am' => $lep_am,
           'lep_af' => $lep_af,
-          'cal_c0' => $cal_c0,
+          'cal_cop' => $cal_cop,
           'cal_c1' => $cal_c1,
           'cal_c2' => $cal_c2,
           'cal_c3' => $cal_c3,
@@ -618,8 +618,8 @@ function bamp_upload_marty_field_form_submit($form, &$form_state) {
           'comments' => $comm,
           'date' => $date,
           'total_lice' => $total_lice,
-          'cop_lep' => $lep_cop,
-          'cop_cal' => $cal_cop,
+          'lep_cop' => $lep_cop,
+          'cal_cop' => $cal_cop,
           'total_cop' => $total_cop,
           'chal_a' => $chal_a,
           'chal_b' => $chal_b,
@@ -1440,7 +1440,7 @@ function dfo_upload_lab_form_submit($form, &$form_state) {
       $total_lice = NULL;
     }
 
-    $lep_c0 = $aa[$j][9];
+    $lep_cop = $aa[$j][9];
     $lep_c1 = $aa[$j][10];
     $lep_c2 = $aa[$j][11];
     $lep_c3 = $aa[$j][12];
@@ -1451,7 +1451,7 @@ function dfo_upload_lab_form_submit($form, &$form_state) {
     $lep_paf = $aa[$j][16];
     $lep_am = $aa[$j][17];
     $lep_af = $aa[$j][18];
-    $cal_c0 = $aa[$j][19];
+    $cal_cop = $aa[$j][19];
     $cal_c1 = $aa[$j][20];
     $cal_c2 = $aa[$j][21];
     $cal_c3 = $aa[$j][22];
@@ -1524,7 +1524,7 @@ function dfo_upload_lab_form_submit($form, &$form_state) {
           'total_lep' => $total_lep,
           'total_caligus' => $total_cal,
           'total_lice' => $total_lice,
-          'lep_c0' => $lep_c0,
+          'lep_cop' => $lep_cop,
           'lep_c1' => $lep_c1,
           'lep_c2' => $lep_c2,
           'lep_c3' => $lep_c3,
@@ -1535,7 +1535,7 @@ function dfo_upload_lab_form_submit($form, &$form_state) {
           'lep_paf' => $lep_paf,
           'lep_am' => $lep_am,
           'lep_af' => $lep_af,
-          'cal_c0' => $cal_c0,
+          'cal_cop' => $cal_cop,
           'cal_c1' => $cal_c1,
           'cal_c2' => $cal_c2,
           'cal_c3' => $cal_c3,

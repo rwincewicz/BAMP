@@ -240,3 +240,129 @@ if (!function_exists('bamp_user_name')) {
     return $username;
   }
 }
+
+if (!function_exists('bamp_form_edit')) {
+
+function bamp_form_edit($table, $id) {
+  
+  $form['form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Entry details'),
+  );
+
+  $result = db_query("SHOW COLUMNS FROM $table");
+  $query = $result->fetchAll();
+
+  $select = db_select($table, 'l');
+
+  $select->condition('l.id', $id, '=');
+
+  $nq = count($query);
+
+  for ($i = 0; $i < $nq; $i++) {
+
+    $field = $query[$i];
+
+    $fields[] = $field->field;
+
+    $fieldsi = $fields[$i];
+
+    $select->addField('l', $fieldsi);
+  }
+
+  $entries = $select->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($entries == NULL) {
+    drupal_set_message(t('Entry not found!'), 'warning');
+
+    $form['form']['id'] = array(
+      '#markup' => 'Id: ' . $id . ' ',
+    );
+
+    $form['form']['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+
+    $form['prev'] = array(
+      '#type' => 'hidden',
+      '#value' => 'prev',
+    );
+
+    $form['reset'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    $form['data'] = array(
+      '#type' => 'hidden',
+      '#value' => 'reset',
+    );
+
+    return $form;
+  }
+
+  $entry_id = (int) $entries[0]['id'];
+
+  $form['form']['prev'] = array(
+    '#type' => 'submit',
+    '#value' => t('Prev'),
+  );
+
+  $form['form']['id'] = array(
+    '#markup' => 'Id: ' . $entry_id . ' ',
+  );
+
+  $form['form']['next'] = array(
+    '#type' => 'submit',
+    '#value' => t('Next'),
+  );
+
+  $old_values = implode(',', $entries[0]);
+
+  for ($i = 1; $i < $nq; $i++) {
+
+    $fieldsi = $fields[$i];
+
+    ${$fieldsi} = $entries[0][$fieldsi];
+
+    $form['form'][$fieldsi] = array(
+      '#type' => 'textfield',
+      '#title' => t("@fieldsi", array('@fieldsi' => ucwords(str_replace('_', ' ', $fieldsi)))),
+      '#default_value' => $entries[0][$fieldsi],
+    );
+  }
+
+  $form['edit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Edit',
+  );
+
+  $form['reset'] = array(
+    '#type' => 'submit',
+    '#value' => 'Reset',
+  );
+
+  $form['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $id,
+  );
+
+  $form['old_values'] = array(
+    '#type' => 'hidden',
+    '#value' => $old_values,
+  );
+
+  $form['data'] = array(
+    '#type' => 'hidden',
+    '#value' => 'reset',
+  );
+
+  return $form;
+}
+}
